@@ -10,6 +10,7 @@ import urllib   ##url fetching
 import urlparse ##url parse
 import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
+import pickle   ##pickle to serialize data
 
 # http://wolfprojects.altervista.org/changeua.php
 from urllib import FancyURLopener
@@ -78,7 +79,6 @@ def parseHTMLNextLink(htmlData):
     nextLinkList = re.search(regExprString, htmlData)
     return nextLinkList
 
-"""
 def parseHTMLTitleUser(htmlData):
     titleUserList = []
     regExprString = r'<tr><td class="title" align="right" valign="top">(.*?)</td>'\
@@ -88,11 +88,10 @@ def parseHTMLTitleUser(htmlData):
                     r'<tr><td colspan="2"></td>'\
                     r'<td class="subtext"><span id="score_.*?">(.*?) points</span> by'\
                     r'<a href="(.*?)">(.*?)</a> (.*?)  \| <a href="(.*?)">(.*?)</a></td></tr>'
-                    
+
     titleUserList = re.findall(regExprString, htmlData)
     return titleUserList
-"""
- 
+
 def nextLinkDelay(startDelay, endDelay):
     randomNum = 0
     randomNum = random.randint(startDelay, endDelay)
@@ -113,6 +112,30 @@ def writeFileDump(htmlData):
     except IOError:
         print 'Problem reading file for append: ', outfilename
         sys.exit(1)
+
+def dumpLinksToRetrieve(LinksToRetrieve):
+#    currDate = time.strftime("%d%m%Y%H%M%S")
+#    filename = currDate + '-LinksToRetrieve.pickle'
+    with open('LinksToRetrieve.pickle', 'wb') as fileHandle:
+        pickle.dump(LinksToRetrieve, fileHandle)
+
+def dumpLinksFetched(LinksFetched):
+#    currDate = time.strftime("%d%m%Y%H%M%S")
+#    filename = currDate + '-LinksFetched.pickle'
+    with open('LinksFetched.pickle', 'wb') as fileHandle:
+        pickle.dump(LinksFetched, fileHandle)
+
+def restoreLinksToRetrieve():
+    restoredLinksToRetrieve = set([])
+    with open('LinksToRetrieve.pickle', 'rb') as fileHandle:
+        restoredLinksToRetrieve = pickle.load(fileHandle)
+    return restoredLinksToRetrieve
+
+def restoreLinksFetched():
+    restoredLinksFetched = set([])
+    with open('LinksFetched.pickle', 'rb') as fileHandle:
+        restoredLinksFetched = pickle.load(fileHandle)
+    return restoredLinksFetched
 
 def writeHTMLToFile(htmlData, filename):
     # Check if directory exists, if not create it
