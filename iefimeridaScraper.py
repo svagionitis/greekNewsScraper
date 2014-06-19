@@ -1,6 +1,7 @@
 #!/usr/bin/python -tt
 
 # import modules used here -- sys is a very standard one
+import os
 import sys
 import re
 import random   ##for pseudo-random generation
@@ -95,6 +96,7 @@ def parseHTMLTitleUser(htmlData):
 def nextLinkDelay(startDelay, endDelay):
     randomNum = 0
     randomNum = random.randint(startDelay, endDelay)
+    print 'Delaying for ', randomNum, ' sec'
     time.sleep(randomNum)
 
 def writeFileDump(htmlData):
@@ -113,6 +115,10 @@ def writeFileDump(htmlData):
         sys.exit(1)
 
 def writeHTMLToFile(htmlData, filename):
+    # Check if directory exists, if not create it
+    dir = os.path.dirname(filename)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
     try:
         fileHandler = open(filename, 'w')
 
@@ -164,21 +170,39 @@ def main():
     # print getNewsLinks(fileData), len(getNewsLinks(fileData))
 
     linksRetrieve = []
-    linksRetrieve = getNewsLinks(fileData)
+    linksFetched = set([])
+    # Retrieve the links from the base url
+    baseHtmlData = getUrl(base_url)
+    linksRetrieve = getNewsLinks(baseHtmlData)
 
     print 'Initial unique links to be retrieved ', len(linksRetrieve)
 
     # http://stackoverflow.com/questions/16625960/modifying-a-set-while-iterating-over-it
     while linksRetrieve:
         link = linksRetrieve.pop()
-        # print len(linksRetrieve)
+        print 'Remaining links to be retrieved ', len(linksRetrieve)
+
+        if link in linksFetched:
+            print 'Link ', link, ' already retieved...'
+            continue
+
+        # Construct the news link
         fetchNewsLink = base_url + '/news/' + link
         print 'Fetching...', fetchNewsLink, ' - ', hashlib.sha1(fetchNewsLink).hexdigest()
 
         htmlData = getUrl(fetchNewsLink)
-        writeHTMLToFile(htmlData, hashlib.sha1(fetchNewsLink).hexdigest()+'.html')
+        writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fetchNewsLink).hexdigest()+'.html')
 
-        nextLinkDelay(11, 13)
+        # Get the news links from this page and add them to the linksRetrieve
+        latestRetrievedLinks = getNewsLinks(htmlData)
+        print 'Will be added ', len(latestRetrievedLinks), ' new links'
+        linksRetrieve.update(latestRetrievedLinks)
+
+        # Add the link if successfully fetched.
+        linksFetched.add(link)
+        print 'Total links fetched so far ', len(linksFetched)
+
+        nextLinkDelay(11, 21)
         # linksRetrieve.add(fetchNewsLink)
         # htmlData = getUrl(fetchNewsLink)
 
