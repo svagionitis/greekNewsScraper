@@ -230,35 +230,6 @@ def main():
         # linksRetrieve.add(fetchNewsLink)
         # htmlData = getUrl(fetchNewsLink)
 
-"""
-    while True:
-        print url, hashlib.sha1(url).hexdigest(), 
-        htmlData = ''
-        htmlData = getUrl(url)
-        print htmlData
-        print parseHTMLItemMain(htmlData), parseHTMLItemMainDead(htmlData)
-        #break
-        print 'hashData:', hashlib.sha256(htmlData).hexdigest()
-        writeFileDump(htmlData)
-        nextLink = parseHTMLNextLink(htmlData)
-        if nextLink:
-            url = base_url + nextLink.group(1)
-        else:
-            break
-        nextLinkDelay(4, 8)
-"""
-        
-    #print fileData
-    #print parseHTMLItemIncrNumber(fileData),  parseHTMLItemId(fileData)
-    #nextLinkDelay(10, 20)
-    #print parseHTMLNextLink(fileData).group(1)
-    #print parseHTMLItemMain(fileData), parseHTMLItemSub(fileData)
-    #print parseHTMLTitleUser(fileData)
-        
-    #print fileData
-    #match = re.findall(r'<td><center><a id=".*?" onclick=".*?" href=".*?"><img src=".*?" border="0" hspace="2" vspace="3"></a><span id=".*?"></span></center></td>', fileData)
-    #print match
-      
 # Standard boilerplate to call the main() function to begin
 # the program.
 if __name__ == '__main__':
