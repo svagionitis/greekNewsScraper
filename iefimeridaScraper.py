@@ -63,12 +63,24 @@ def getNewsTitle(htmlData):
     newsTitle = re.search(regExprString, htmlData).group(1)
     return newsTitle
 
+def getNewsAuthor(htmlData):
+    newsAuthor = 'Anonymous'
+    return newsAuthor
+
 def getNewsDescription(htmlData):
     newsDescription = ''
     regExprString = r'<meta name="description" content="(.*?)" />'
     newsDescription = re.search(regExprString, htmlData).group(1)
     newsDescription = replaceEntities(newsDescription)
     return newsDescription
+
+def getNewsKeywords(htmlData):
+    newsKeywords = []
+    regExprString = r'<meta name="keywords" content="(.*?)" />'
+    newsKeywords = re.search(regExprString, htmlData).group(1)
+    # Split string to commas
+    newsKeywords = re.split(',+', str(newsKeywords))
+    return newsKeywords
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
@@ -85,6 +97,8 @@ def getNewsText(htmlData):
     newsText = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsText)
     # Remove all the html tags, need a clear text
     newsText = re.sub(r'<[^>]*>', '', newsText)
+    # Remove any white spaces in the beginning
+    newsText = re.sub(r'^[\s]*', '', newsText)
     # Remove any white spaces at the end
     newsText = re.sub(r'[\s]*$', '', newsText)
     return newsText
@@ -95,7 +109,9 @@ def createNewsData(htmlData, fullNewsURL):
     data['NewsLink'] = fullNewsURL
     data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
     data['NewsTitle'] = getNewsTitle(htmlData)
+    data['NewsAuthor'] = getNewsAuthor(htmlData)
     data['NewsDescription'] = getNewsDescription(htmlData)
+    data['NewsKeywords'] = getNewsKeywords(htmlData)
     data['NewsDateCreated'] = getNewsDateCreated(htmlData)
     data['NewsText'] = getNewsText(htmlData)
     data['HashNewsText'] = hashlib.sha1(getNewsText(htmlData)).hexdigest()
