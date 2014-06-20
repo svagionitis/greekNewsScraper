@@ -42,10 +42,18 @@ def readFile(filename):
     except IOError:
         print 'Problem reading file: ', filename
 
+def replaceEntities(htmlData):
+    data = htmlData
+    data = re.sub(r'&nbsp;|&#160;', ' ', data)
+    data = re.sub(r'&lt;|&#60;', '<', data)
+    data = re.sub(r'&gt;|&#62;', '>', data)
+    data = re.sub(r'&amp;|&#38;', '&', data)
+    data = re.sub(r'&#039;', '\'', data)
+    return data
 
 def getNewsTitle(htmlData):
     newsTitle = ''
-    regExprString = r'.*?<div class="views-field-title">\n.*?<span class="field-content"><h1>(.*?)</h1></span>\n.*?</div>'
+    regExprString = r'.*?<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
     newsTitle = re.search(regExprString, htmlData).group(1)
     return newsTitle
 
@@ -53,14 +61,27 @@ def getNewsDescription(htmlData):
     newsDescription = ''
     regExprString = r'<meta name="description" content="(.*?)" />'
     newsDescription = re.search(regExprString, htmlData).group(1)
+    newsDescription = replaceEntities(newsDescription)
     return newsDescription
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
-    regExprString = r'.*?<div class="views-field-created">\n.*?<span class="field-content">(.*?)</span>\n.*?</div>'
+    regExprString = r'.*?<div class="views-field-created">\s.*?<span class="field-content">(.*?)</span>\s.*?</div>'
     newsDateCreated = re.search(regExprString, htmlData).group(1)
     return newsDateCreated
 
+def getNewsText(htmlData):
+    newsText = ''
+    regExprString = r'.*?<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
+    newsText = re.search(regExprString, htmlData).group(1)
+    newsText = replaceEntities(newsText)
+    # Remove the images attached
+    newsText = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsText)
+    # Remove all the html tags, need a clear text
+    newsText = re.sub(r'<[^>]*>', '', newsText)
+    # Remove any white spaces at the end
+    newsText = re.sub(r'[\s]*$', '', newsText)
+    return newsText
 
 def nextLinkDelay(startDelay, endDelay):
     randomNum = 0
@@ -186,6 +207,7 @@ def main():
 
 
         print getNewsTitle(htmlData), ' - ', getNewsDescription(htmlData), ' - ', getNewsDateCreated(htmlData)
+        print getNewsText(htmlData)
 
 
         # Get the news links from this page and add them to the linksRetrieve
