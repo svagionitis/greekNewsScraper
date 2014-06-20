@@ -43,54 +43,24 @@ def readFile(filename):
         print 'Problem reading file: ', filename
 
 
-def parseHTMLItemIncrNumber(htmlData):
-    item_incr_number_List = []
-    regExprString = r'<td align=right valign=top class="title">(.*?)\.</td>'
-    item_incr_number_List = re.findall(regExprString, htmlData)
-    return item_incr_number_List
+def getNewsTitle(htmlData):
+    newsTitle = ''
+    regExprString = r'.*?<div class="views-field-title">\n.*?<span class="field-content"><h1>(.*?)</h1></span>\n.*?</div>'
+    newsTitle = re.search(regExprString, htmlData).group(1)
+    return newsTitle
 
-def parseHTMLItemId(htmlData):
-    item_id_List = []
-    regExprString = r'<td><center><a id=up_(.*?) .*?href=".*?"><img src=".*?" border=0 vspace=3 hspace=2></a>'
-    item_id_List = re.findall(regExprString, htmlData)
-    return item_id_List
+def getNewsDescription(htmlData):
+    newsDescription = ''
+    regExprString = r'<meta name="description" content="(.*?)" />'
+    newsDescription = re.search(regExprString, htmlData).group(1)
+    return newsDescription
 
-def parseHTMLItemMain(htmlData):
-    itemMainList = []
-    regExprString = r'<td class="title"><a href="([http|item].*?)".*?>(.*?)</a>.*?</td>'
-    itemMainList = re.findall(regExprString, htmlData)
-    return itemMainList
+def getNewsDateCreated(htmlData):
+    newsDateCreated = ''
+    regExprString = r'.*?<div class="views-field-created">\n.*?<span class="field-content">(.*?)</span>\n.*?</div>'
+    newsDateCreated = re.search(regExprString, htmlData).group(1)
+    return newsDateCreated
 
-def parseHTMLItemMainDead(htmlData):
-    itemMainDeadList = []
-    regExprString = r'<td class="title"> [dead] <a rel="nofollow">(.*?)</a>.*?</td>'
-    itemMainDeadList = re.findall(regExprString, htmlData)
-    return itemMainDeadList
-
-def parseHTMLItemSub(htmlData):
-    itemSubList = []
-    regExprString = r'<td class="subtext"><span id=score_.*?>(.*?) point.*?</span> by <a href="(.*?)">(.*?)</a> (.*?)  \| <a href="(.*?)">(.*?)</a></td>'
-    itemSubList = re.findall(regExprString, htmlData)
-    return itemSubList
-
-def parseHTMLNextLink(htmlData):
-    nextLinkList = ''
-    regExprString = r'<td colspan=2></td><td class="title"><a href="(.*?)" rel="nofollow">More</a></td>'
-    nextLinkList = re.search(regExprString, htmlData)
-    return nextLinkList
-
-def parseHTMLTitleUser(htmlData):
-    titleUserList = []
-    regExprString = r'<tr><td class="title" align="right" valign="top">(.*?)</td>'\
-                    r'<td><center><a id="up_(.*?)" href=".*?"><img src=".*?" border="0" hspace="2" vspace="3"></a>'\
-                    r'<span id="down_.*?"></span></center></td>'\
-                    r'<td class="title"><a href="(.*?)">(.*?)</a><span class="comhead"> \((.*?)\) </span></td></tr>'\
-                    r'<tr><td colspan="2"></td>'\
-                    r'<td class="subtext"><span id="score_.*?">(.*?) points</span> by'\
-                    r'<a href="(.*?)">(.*?)</a> (.*?)  \| <a href="(.*?)">(.*?)</a></td></tr>'
-
-    titleUserList = re.findall(regExprString, htmlData)
-    return titleUserList
 
 def nextLinkDelay(startDelay, endDelay):
     randomNum = 0
@@ -144,9 +114,7 @@ def writeHTMLToFile(htmlData, filename):
         os.makedirs(dir)
     try:
         fileHandler = open(filename, 'w')
-
         fileHandler.write(htmlData)
-
         fileHandler.close()
     except IOError:
         print 'Problem writing to file ', filename
@@ -215,6 +183,10 @@ def main():
 
         htmlData = getUrl(fetchNewsLink)
         writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fetchNewsLink).hexdigest()+'.html')
+
+
+        print getNewsTitle(htmlData), ' - ', getNewsDescription(htmlData), ' - ', getNewsDateCreated(htmlData)
+
 
         # Get the news links from this page and add them to the linksRetrieve
         latestRetrievedLinks = getNewsLinks(htmlData)
