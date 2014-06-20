@@ -6,11 +6,13 @@ import sys
 import re
 import random   ##for pseudo-random generation
 import time     ##for time functions and sleep
+from datetime import datetime ##get time
 import urllib   ##url fetching
 import urlparse ##url parse
 import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
+import json     ##json to serialize data, web friendly??
 
 # http://wolfprojects.altervista.org/changeua.php
 from urllib import FancyURLopener
@@ -51,6 +53,10 @@ def replaceEntities(htmlData):
     data = re.sub(r'&#039;', '\'', data)
     return data
 
+def getNewsLink(baseURL, newsURL):
+    url = baseURL + newsURL
+    return url
+
 def getNewsTitle(htmlData):
     newsTitle = ''
     regExprString = r'.*?<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
@@ -83,38 +89,36 @@ def getNewsText(htmlData):
     newsText = re.sub(r'[\s]*$', '', newsText)
     return newsText
 
+def createNewsData(htmlData, fullNewsURL):
+    data = {}
+    data['DateRetrieved'] = str(datetime.now())
+    data['NewsLink'] = fullNewsURL
+    data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
+    data['NewsTitle'] = getNewsTitle(htmlData)
+    data['NewsDescription'] = getNewsDescription(htmlData)
+    data['NewsDateCreated'] = getNewsDateCreated(htmlData)
+    data['NewsText'] = getNewsText(htmlData)
+    data['HashNewsText'] = hashlib.sha1(getNewsText(htmlData)).hexdigest()
+    return data
+
 def nextLinkDelay(startDelay, endDelay):
     randomNum = 0
     randomNum = random.randint(startDelay, endDelay)
     print 'Delaying for ', randomNum, ' sec'
     time.sleep(randomNum)
 
-def writeFileDump(htmlData):
-    outfilename = 'dump.txt'
-    try:
-        outfileHandler = open(outfilename, 'a')
-        outList = zip(parseHTMLItemIncrNumber(htmlData), parseHTMLItemId(htmlData), \
-                      parseHTMLItemMain(htmlData), parseHTMLItemSub(htmlData))
-        for temp in outList:
-            outfileHandler.write(temp[0]   +' | '+temp[1]   +' | '+temp[2][0]+' | '+temp[2][1]+' | '+\
-                                 temp[3][0]+' | '+temp[3][1]+' | '+temp[3][2]+' | '+temp[3][3]+' | '+\
-                                 temp[3][4]+' | '+temp[3][5]+'\n')
-        outfileHandler.close()
-    except IOError:
-        print 'Problem reading file for append: ', outfilename
-        sys.exit(1)
 
 def dumpLinksToRetrieve(LinksToRetrieve):
 #    currDate = time.strftime("%d%m%Y%H%M%S")
 #    filename = currDate + '-LinksToRetrieve.pickle'
-    with open('LinksToRetrieve.pickle', 'wb') as fileHandle:
-        pickle.dump(LinksToRetrieve, fileHandle)
+    with open('LinksToRetrieve.pickle', 'wb') as pickleFileHandle:
+        pickle.dump(LinksToRetrieve, pickleFileHandle)
 
 def dumpLinksFetched(LinksFetched):
 #    currDate = time.strftime("%d%m%Y%H%M%S")
 #    filename = currDate + '-LinksFetched.pickle'
-    with open('LinksFetched.pickle', 'wb') as fileHandle:
-        pickle.dump(LinksFetched, fileHandle)
+    with open('LinksFetched.pickle', 'wb') as pickleFileHandle:
+        pickle.dump(LinksFetched, pickleFileHandle)
 
 def restoreLinksToRetrieve():
     restoredLinksToRetrieve = set([])
@@ -141,13 +145,9 @@ def writeHTMLToFile(htmlData, filename):
         print 'Problem writing to file ', filename
         sys.exit(1)
 
-def putItemsInDict(htmlData):
-    itemDict = {}
-    return itemDict
-
 def getNewsLinks(htmlPage):
     newsLinks = []
-    regExprString = r'<a href="/news/(.*?)"'
+    regExprString = r'<a href="(/news/.*?)"'
     # Use set in order to get the unique elements and not dublicates
     newsLinks = set(re.findall(regExprString, htmlPage))
     return newsLinks
@@ -199,15 +199,18 @@ def main():
             continue
 
         # Construct the news link
-        fetchNewsLink = base_url + '/news/' + link
+        fetchNewsLink = getNewsLink(base_url, link)
         print 'Fetching...', fetchNewsLink, ' - ', hashlib.sha1(fetchNewsLink).hexdigest()
 
         htmlData = getUrl(fetchNewsLink)
         writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fetchNewsLink).hexdigest()+'.html')
 
 
-        print getNewsTitle(htmlData), ' - ', getNewsDescription(htmlData), ' - ', getNewsDateCreated(htmlData)
-        print getNewsText(htmlData)
+        # print getNewsTitle(htmlData), ' - ', getNewsDescription(htmlData), ' - ', getNewsDateCreated(htmlData)
+        # print getNewsText(htmlData)
+
+        # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
+        print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
 
         # Get the news links from this page and add them to the linksRetrieve
@@ -220,6 +223,10 @@ def main():
         print 'Total links fetched so far ', len(linksFetched)
 
         nextLinkDelay(11, 21)
+
+        dumpLinksToRetrieve(linksRetrieve)
+        dumpLinksFetched(linksFetched)
+
         # linksRetrieve.add(fetchNewsLink)
         # htmlData = getUrl(fetchNewsLink)
 
