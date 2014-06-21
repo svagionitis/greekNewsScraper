@@ -160,9 +160,10 @@ def writeHTMLToFile(htmlData, filename):
 
 def getNewsLinks(htmlPage):
     newsLinks = []
-    regExprString = r'<a href="(/news/.*?)"'
+    regExprString = r'<a href="(/news/.*?)(#.*?)*"'
+    newsLinksTemp = re.findall(regExprString, htmlPage)
     # Use set in order to get the unique elements and not dublicates
-    newsLinks = set(re.findall(regExprString, htmlPage))
+    newsLinks = set([ seq[0] for seq in newsLinksTemp ])
     return newsLinks
 
 ## Version that uses try/except to print an error message if the
@@ -198,7 +199,7 @@ def main():
         print 'Remaining links to be retrieved ', len(linksRetrieve)
 
         if link in linksFetched:
-            print 'Link ', link, ' already retieved...'
+            print 'Link ', urllib.unquote(link), ' already retieved...'
             continue
 
         # Construct the news link
