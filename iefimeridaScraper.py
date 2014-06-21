@@ -34,9 +34,9 @@ def readFile(filename):
     except IOError:
         print 'Problem reading file: ', filename
 
-def replaceEntities(htmlData):
+def replaceEntities(inData):
     # Source http://dev.w3.org/html5/html-author/charref
-    data = htmlData
+    data = inData
     data = re.sub(r'&nbsp;|&#160;', ' ', data)
     data = re.sub(r'&lt;|&#.*?60;', '<', data)
     data = re.sub(r'&gt;|&#.*?62;', '>', data)
@@ -50,14 +50,29 @@ def replaceEntities(htmlData):
     data = re.sub(r'&percnt;|&#.*?37;', '%', data)
     return data
 
-def getNewsLink(baseURL, newsURL):
-    url = baseURL + newsURL
+def constructFullURL(baseURL, localURL):
+    isStartingHttp = re.compile('^http.*?')
+    if isStartingHttp.match(localURL):
+        url = localURL
+    else:
+        url = baseURL + localURL
     return url
+
+def excludeLocalLinks(localLink):
+    # Regex for excluded links
+    excludeLink = re.compile('/print.*?|.*?/feed$')
+    if excludeLink.match(localLink):
+        print 'Link ', urllib.unquote(localLink), ' is excluded. It will not be fetched...'
+        return True
+    else:
+        return False
+
 
 def getNewsTitle(htmlData):
     newsTitle = ''
     regExprString = r'.*?<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
     newsTitle = re.search(regExprString, htmlData).group(1)
+    newsTitle = replaceEntities(newsTitle)
     return newsTitle
 
 def getNewsAuthor(htmlData):
@@ -75,6 +90,7 @@ def getNewsKeywords(htmlData):
     newsKeywords = []
     regExprString = r'<meta name="keywords" content="(.*?)" />'
     newsKeywords = re.search(regExprString, htmlData).group(1)
+    newsKeywords = replaceEntities(newsKeywords)
     # Split string in commas
     newsKeywords = re.split(',+', str(newsKeywords))
     return newsKeywords
@@ -125,19 +141,19 @@ def nextLinkDelay(startDelay, endDelay):
     time.sleep(randomNum)
 
 
-def dumpLinksToRetrieve(LinksToRetrieve):
-    with open('LinksToRetrieve.pickle', 'wb') as pickleFileHandle:
-        pickle.dump(LinksToRetrieve, pickleFileHandle)
+def dumpLinksToFetch(LinksToFetch):
+    with open('LinksToFetch.pickle', 'wb') as pickleFileHandle:
+        pickle.dump(LinksToFetch, pickleFileHandle)
 
 def dumpLinksFetched(LinksFetched):
     with open('LinksFetched.pickle', 'wb') as pickleFileHandle:
         pickle.dump(LinksFetched, pickleFileHandle)
 
-def restoreLinksToRetrieve():
-    restoredLinksToRetrieve = set([])
-    with open('LinksToRetrieve.pickle', 'rb') as fileHandle:
-        restoredLinksToRetrieve = pickle.load(fileHandle)
-    return restoredLinksToRetrieve
+def restoreLinksToFetch():
+    restoredLinksToFetch = set([])
+    with open('LinksToFetch.pickle', 'rb') as fileHandle:
+        restoredLinksToFetch = pickle.load(fileHandle)
+    return restoredLinksToFetch
 
 def restoreLinksFetched():
     restoredLinksFetched = set([])
@@ -157,6 +173,14 @@ def writeHTMLToFile(htmlData, filename):
     except IOError:
         print 'Problem writing to file ', filename
         sys.exit(1)
+
+def getLocalLinks(htmlPage):
+    localLinks = []
+    regExprString = r'<a href="(/.*?)(#.*?)*"'
+    localLinksTemp = re.findall(regExprString, htmlPage)
+    # Get the link without the hasgtag anchor
+    localLinks = set([ seq[0] for seq in localLinksTemp ])
+    return localLinks
 
 def getNewsLinks(htmlPage):
     newsLinks = []
@@ -183,53 +207,63 @@ def getUrl(url):
 
 # Gather our code in a main() function
 def main():
-    base_url = 'http://www.iefimerida.gr'
+    baseURL = 'http://www.iefimerida.gr'
 
-    linksRetrieve = []
+    linksToFetch = []
     linksFetched = set([])
+    localLinksRetrieve = set([])
     # Retrieve the links from the base url
-    baseHtmlData = getUrl(base_url)
-    linksRetrieve = getNewsLinks(baseHtmlData)
+    baseHtmlData = getUrl(baseURL)
+    linksToFetch = getLocalLinks(baseHtmlData)
 
-    print 'Initial unique links to be retrieved ', len(linksRetrieve)
+    print 'Initial unique links to be retrieved ', len(linksToFetch)
 
     # http://stackoverflow.com/questions/16625960/modifying-a-set-while-iterating-over-it
-    while linksRetrieve:
-        link = linksRetrieve.pop()
-        print 'Remaining links to be retrieved ', len(linksRetrieve)
+    while linksToFetch:
+        localLink = linksToFetch.pop()
+        print 'Remaining links to be fetched ', len(linksToFetch)
 
-        if link in linksFetched:
-            print 'Link ', urllib.unquote(link), ' already retieved...'
+        if localLink in linksFetched:
+            print 'Link ', urllib.unquote(localLink), ' already fetched...'
             continue
 
-        # Construct the news link
-        fetchNewsLink = getNewsLink(base_url, link)
+        if excludeLocalLinks(localLink):
+            # Add in the fetched although is not fetched!!!
+            linksFetched.add(localLink)
+            continue
+
+        # Construct the full link
+        fullLink = constructFullURL(baseURL, localLink)
         # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
-        print 'Fetching...', urllib.unquote(fetchNewsLink), ' - ', hashlib.sha1(fetchNewsLink).hexdigest()
+        print 'Fetching...', urllib.unquote(fullLink), ' - ', hashlib.sha1(fullLink).hexdigest()
 
-        htmlData = getUrl(fetchNewsLink)
-        writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fetchNewsLink).hexdigest()+'.html')
+        htmlData = getUrl(fullLink)
 
-        # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
-        # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
+        # Check if it's a news link
+        isNewsLink = re.compile('.*?/news/.*?')
+        if isNewsLink.match(fullLink):
+            writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fullLink).hexdigest()+'.html')
 
-        jsonData = json.dumps(createNewsData(htmlData, fetchNewsLink), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
-        print jsonData
+            # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
+            # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
-        jsonDump(createNewsData(htmlData, fetchNewsLink), 'iefimerida.json')
+            jsonData = json.dumps(createNewsData(htmlData, fullLink), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
+            print jsonData
 
-        # Get the news links from this page and add them to the linksRetrieve
-        latestRetrievedLinks = getNewsLinks(htmlData)
-        print 'Will be added ', len(latestRetrievedLinks), ' new links'
-        linksRetrieve.update(latestRetrievedLinks)
+            jsonDump(createNewsData(htmlData, fullLink), 'iefimerida.json')
+
+        # Get the local links from this page and add them to the linksToFetch
+        newLinksToFetch = getLocalLinks(htmlData)
+        print 'Will be added ', len(newLinksToFetch), ' new links'
+        linksToFetch.update(newLinksToFetch)
 
         # Add the link if successfully fetched.
-        linksFetched.add(link)
+        linksFetched.add(localLink)
         print 'Total links fetched so far ', len(linksFetched)
 
         nextLinkDelay(11, 21)
 
-        dumpLinksToRetrieve(linksRetrieve)
+        dumpLinksToFetch(linksToFetch)
         dumpLinksFetched(linksFetched)
 
 # Standard boilerplate to call the main() function to begin
