@@ -22,17 +22,6 @@ from urllib import FancyURLopener
 class MyOpener(FancyURLopener):
     version = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
-#namefind is supposed to match a tag name and attributes into groups 1 and 2 respectively.
-#the original version of this pattern:
-# namefind = re.compile(r'(\S*)\s*(.+)', re.DOTALL)
-#insists that there must be attributes and if necessary will steal the last character
-#of the tag name to make it so. this is annoying, so let us try:
-namefind = re.compile(r'(\S+)\s*(.*)', re.DOTALL)
-
-attrfind = re.compile(
-    r'\s*([a-zA-Z_][-:.a-zA-Z_0-9]*)(\s*=\s*'
-    r'(\'[^\']*\'|"[^"]*"|[-a-zA-Z0-9./,:;+*%?!&$\(\)_#=~\'"@]*))?')   # this is taken from sgmllib
-
 
 def readFile(filename):
     """Read a filename. Output is the content of the file as a string"""
@@ -79,7 +68,7 @@ def getNewsKeywords(htmlData):
     newsKeywords = []
     regExprString = r'<meta name="keywords" content="(.*?)" />'
     newsKeywords = re.search(regExprString, htmlData).group(1)
-    # Split string to commas
+    # Split string in commas
     newsKeywords = re.split(',+', str(newsKeywords))
     return newsKeywords
 
@@ -130,14 +119,10 @@ def nextLinkDelay(startDelay, endDelay):
 
 
 def dumpLinksToRetrieve(LinksToRetrieve):
-#    currDate = time.strftime("%d%m%Y%H%M%S")
-#    filename = currDate + '-LinksToRetrieve.pickle'
     with open('LinksToRetrieve.pickle', 'wb') as pickleFileHandle:
         pickle.dump(LinksToRetrieve, pickleFileHandle)
 
 def dumpLinksFetched(LinksFetched):
-#    currDate = time.strftime("%d%m%Y%H%M%S")
-#    filename = currDate + '-LinksFetched.pickle'
     with open('LinksFetched.pickle', 'wb') as pickleFileHandle:
         pickle.dump(LinksFetched, pickleFileHandle)
 
@@ -191,16 +176,6 @@ def getUrl(url):
 # Gather our code in a main() function
 def main():
     base_url = 'http://www.iefimerida.gr'
-    url = ''
-    url = 'http://www.iefimerida.gr/'
-
-    filename = 'startPageIefimerida.html'
-    fileData = ''
-    fileData = readFile(filename)
-    # writeFileDump(fileData)
-
-    # print fileData
-    # print getNewsLinks(fileData), len(getNewsLinks(fileData))
 
     linksRetrieve = []
     linksFetched = set([])
@@ -227,10 +202,6 @@ def main():
         htmlData = getUrl(fetchNewsLink)
         writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fetchNewsLink).hexdigest()+'.html')
 
-
-        # print getNewsTitle(htmlData), ' - ', getNewsDescription(htmlData), ' - ', getNewsDateCreated(htmlData)
-        # print getNewsText(htmlData)
-
         # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
         # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
@@ -253,11 +224,8 @@ def main():
         dumpLinksToRetrieve(linksRetrieve)
         dumpLinksFetched(linksFetched)
 
-        # linksRetrieve.add(fetchNewsLink)
-        # htmlData = getUrl(fetchNewsLink)
-
 # Standard boilerplate to call the main() function to begin
 # the program.
 if __name__ == '__main__':
   main()
-  
+
