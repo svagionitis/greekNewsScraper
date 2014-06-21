@@ -2,6 +2,7 @@
 
 # import modules used here -- sys is a very standard one
 import os
+import io
 import sys
 import re
 import random   ##for pseudo-random generation
@@ -106,7 +107,7 @@ def getNewsText(htmlData):
 def createNewsData(htmlData, fullNewsURL):
     data = {}
     data['DateRetrieved'] = str(datetime.now())
-    data['NewsLink'] = fullNewsURL
+    data['NewsLink'] = urllib.unquote(fullNewsURL)
     data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
     data['NewsTitle'] = getNewsTitle(htmlData)
     data['NewsAuthor'] = getNewsAuthor(htmlData)
@@ -116,6 +117,10 @@ def createNewsData(htmlData, fullNewsURL):
     data['NewsText'] = getNewsText(htmlData)
     data['HashNewsText'] = hashlib.sha1(getNewsText(htmlData)).hexdigest()
     return data
+
+def jsonDump(data, jsonFilename):
+    with open(jsonFilename, 'a+') as jsonFileHandle:
+        json.dump( data, jsonFileHandle, sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
 
 def nextLinkDelay(startDelay, endDelay):
     randomNum = 0
@@ -216,7 +221,8 @@ def main():
 
         # Construct the news link
         fetchNewsLink = getNewsLink(base_url, link)
-        print 'Fetching...', fetchNewsLink, ' - ', hashlib.sha1(fetchNewsLink).hexdigest()
+        # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
+        print 'Fetching...', urllib.unquote(fetchNewsLink), ' - ', hashlib.sha1(fetchNewsLink).hexdigest()
 
         htmlData = getUrl(fetchNewsLink)
         writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fetchNewsLink).hexdigest()+'.html')
@@ -226,8 +232,12 @@ def main():
         # print getNewsText(htmlData)
 
         # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
-        print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
+        # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
+        jsonData = json.dumps(createNewsData(htmlData, fetchNewsLink), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
+        print jsonData
+
+        jsonDump(createNewsData(htmlData, fetchNewsLink), 'iefimerida.json')
 
         # Get the news links from this page and add them to the linksRetrieve
         latestRetrievedLinks = getNewsLinks(htmlData)
