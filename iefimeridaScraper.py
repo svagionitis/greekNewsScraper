@@ -45,7 +45,6 @@ def replaceEntities(htmlData):
     data = re.sub(r'&quot;|&#.*?34;', '"', data)
     data = re.sub(r'&tilde;|&#.*?732;', '~', data)
     data = re.sub(r'&circ;|&#.*?710;', '^', data)
-    data = re.sub(r'&acute;|&#.*?180;', '΄', data)
     data = re.sub(r'&excl;|&#.*?33;', '!', data)
     data = re.sub(r'&num;|&#.*?35;', '#', data)
     data = re.sub(r'&percnt;|&#.*?37;', '%', data)
