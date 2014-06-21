@@ -35,12 +35,20 @@ def readFile(filename):
         print 'Problem reading file: ', filename
 
 def replaceEntities(htmlData):
+    # Source http://dev.w3.org/html5/html-author/charref
     data = htmlData
     data = re.sub(r'&nbsp;|&#160;', ' ', data)
-    data = re.sub(r'&lt;|&#60;', '<', data)
-    data = re.sub(r'&gt;|&#62;', '>', data)
-    data = re.sub(r'&amp;|&#38;', '&', data)
-    data = re.sub(r'&#039;', '\'', data)
+    data = re.sub(r'&lt;|&#.*?60;', '<', data)
+    data = re.sub(r'&gt;|&#.*?62;', '>', data)
+    data = re.sub(r'&amp;|&#.*?38;', '&', data)
+    data = re.sub(r'&apos;|&#.*?39;', '\'', data)
+    data = re.sub(r'&quot;|&#.*?34;', '"', data)
+    data = re.sub(r'&tilde;|&#.*?732;', '~', data)
+    data = re.sub(r'&circ;|&#.*?710;', '^', data)
+    data = re.sub(r'&acute;|&#.*?180;', '΄', data)
+    data = re.sub(r'&excl;|&#.*?33;', '!', data)
+    data = re.sub(r'&num;|&#.*?35;', '#', data)
+    data = re.sub(r'&percnt;|&#.*?37;', '%', data)
     return data
 
 def getNewsLink(baseURL, newsURL):
