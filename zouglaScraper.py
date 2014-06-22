@@ -197,7 +197,6 @@ def getLocalLinks(htmlPage):
     localLinksTemp = re.findall(regExprString, htmlPage)
     # Get the link without the hasgtag anchor
     localLinks = set([ seq[2] for seq in localLinksTemp ])
-    print localLinks
     return localLinks
 
 def getNewsLinks(htmlPage):
@@ -266,7 +265,7 @@ def main():
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
             jsonData = json.dumps(createNewsData(htmlData, fullLink), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
-            # print jsonData
+            print jsonData
 
             jsonDump(createNewsData(htmlData, fullLink), 'zougla.json')
 
