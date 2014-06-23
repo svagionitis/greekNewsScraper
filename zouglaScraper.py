@@ -65,58 +65,81 @@ def excludeLocalLinks(localLink):
 def getNewsTitle(htmlData):
     newsTitle = ''
     regExprString = r'<h1 class="article_title">\s*?(.*?)</h1>'
-    newsTitle = re.search(regExprString, htmlData).group(1)
-    newsTitle = replaceEntities(newsTitle)
-    # Remove any white spaces in the beginning
-    newsTitle = re.sub(r'^[\s]*', '', newsTitle)
-    # Remove any white spaces at the end
-    newsTitle = re.sub(r'[\s]*$', '', newsTitle)
+    if re.search(regExprString, htmlData):
+        newsTitle = re.search(regExprString, htmlData).group(1)
+        newsTitle = replaceEntities(newsTitle)
+        # Remove any white spaces in the beginning
+        newsTitle = re.sub(r'^[\s]*', '', newsTitle)
+        # Remove any white spaces at the end
+        newsTitle = re.sub(r'[\s]*$', '', newsTitle)
+    else:
+        newsTitle = 'N/A'
     return newsTitle
 
 def getNewsAuthor(htmlData):
     newsAuthor = ''
-    regExprString = r'.*?<div class="author">(.*?)\s*?</div>'
+    regExprString = r'.*?<div class="author">\s*(.*?)\s*?</div>'
+    if re.search(regExprString, htmlData):
+        newsAuthor = re.search(regExprString, htmlData).group(1)
+    else:
+        newsAuthor = 'N/A'
     return newsAuthor
 
 def getNewsDescription(htmlData):
     newsDescription = ''
     regExprString = r'<meta name="description" content="(.*?)" />'
-    newsDescription = re.search(regExprString, htmlData).group(1)
-    newsDescription = replaceEntities(newsDescription)
+    # Check if group exists
+    if re.search(regExprString, htmlData):
+        newsDescription = re.search(regExprString, htmlData).group(1)
+        newsDescription = replaceEntities(newsDescription)
+    else:
+        newsDescription = 'N/A'
     return newsDescription
 
 def getNewsKeywords(htmlData):
     newsKeywords = []
     regExprString = r'<meta name="keywords" content="(.*?)" />'
-    newsKeywords = re.search(regExprString, htmlData).group(1)
-    newsKeywords = replaceEntities(newsKeywords)
-    # Split string in commas
-    newsKeywords = re.split(',+', str(newsKeywords))
+    if re.search(regExprString, htmlData):
+        newsKeywords = re.search(regExprString, htmlData).group(1)
+        newsKeywords = replaceEntities(newsKeywords)
+        # Split string in commas
+        newsKeywords = re.split(',+', str(newsKeywords))
+    else:
+        newsKeywords = 'N/A'
     return newsKeywords
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
     regExprString = r'<div class="top_date">\s*?.*?: (.*?)\s*?</div>'
-    newsDateCreated = re.search(regExprString, htmlData).group(1)
+    if re.search(regExprString, htmlData):
+        newsDateCreated = re.search(regExprString, htmlData).group(1)
+    else:
+        newsDateCreated = 'N/A'
     return newsDateCreated
 
 def getNewsDateUpdated(htmlData):
     newsDateUpdated = ''
     regExprString = r'<div class="date">\s*?<p>\s*?.*?: (.*?)</p>\s*?</div>'
-    newsDateUpdated = re.search(regExprString, htmlData).group(1)
+    if re.search(regExprString, htmlData):
+        newsDateUpdated = re.search(regExprString, htmlData).group(1)
+    else:
+        newsDateUpdated = 'N/A'
     return newsDateUpdated
 
 def getNewsText(htmlData):
     newsText = ''
     regExprString = r'.*?<div class="description">\s([.\s\S]*?)\s.*?</div>'
-    newsText = re.search(regExprString, htmlData).group(1)
-    newsText = replaceEntities(newsText)
-    # Remove all the html tags, need a clear text
-    newsText = re.sub(r'<[^>]*>', '', newsText)
-    # Remove any white spaces in the beginning
-    newsText = re.sub(r'^[\s]*', '', newsText)
-    # Remove any white spaces at the end
-    newsText = re.sub(r'[\s]*$', '', newsText)
+    if re.search(regExprString, htmlData):
+        newsText = re.search(regExprString, htmlData).group(1)
+        newsText = replaceEntities(newsText)
+        # Remove all the html tags, need a clear text
+        newsText = re.sub(r'<[^>]*>', '', newsText)
+        # Remove any white spaces in the beginning
+        newsText = re.sub(r'^[\s]*', '', newsText)
+        # Remove any white spaces at the end
+        newsText = re.sub(r'[\s]*$', '', newsText)
+    else:
+        newsText = 'N/A'
     return newsText
 
 def createNewsData(htmlData, fullNewsURL):
@@ -214,7 +237,7 @@ def getUrl(url):
 
 # Gather our code in a main() function
 def main():
-    baseURL = 'http://www.zougla.gr'
+    baseURL = 'http://www.zougla.gr/'
 
     linksToFetch = []
     linksFetched = set([])
