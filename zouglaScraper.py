@@ -239,13 +239,18 @@ def getUrl(url):
 def main():
     baseURL = 'http://www.zougla.gr/'
 
-    linksToFetch = []
+    linksToFetch = set([])
     linksFetched = set([])
     localLinksRetrieve = set([])
-    # Retrieve the links from the base url
-    baseHtmlData = getUrl(baseURL)
-    linksToFetch = getLocalLinks(baseHtmlData, baseURL)
-    linksFetched.add(baseURL)
+    # Retrieve the links from the base url if the pickle files are not present
+    if os.path.isfile('LinksFetched.pickle') and os.path.isfile('LinksToFetch.pickle'):
+        print 'LinksFetched.pickle and LinksToFetch.pickle are present. Restoring...'
+        linksToFetch = restoreLinksToFetch()
+        linksFetched = restoreLinksFetched()
+    else:
+        baseHtmlData = getUrl(baseURL)
+        linksToFetch = getLocalLinks(baseHtmlData, baseURL)
+        linksFetched.add(baseURL)
 
     print 'Initial unique links to be retrieved ', len(linksToFetch)
 
