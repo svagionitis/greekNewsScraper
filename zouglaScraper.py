@@ -208,7 +208,7 @@ def getLocalLinks(htmlPage, baseURL):
     regExprString = r'<a href="(.*?)(#.*?)*"'
     localLinksTemp = re.findall(regExprString, htmlPage)
     # Get the link without the hasgtag anchor
-    localLinks = [ seq[0] for seq in localLinksTemp ]
+    localLinks = set([ seq[0] for seq in localLinksTemp ])
     fullLinks = set([ urljoin(baseURL, s) for s in localLinks ])
     return fullLinks
 
