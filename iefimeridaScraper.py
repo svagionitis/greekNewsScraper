@@ -54,7 +54,7 @@ def replaceEntities(inData):
 
 def excludeLocalLinks(localLink):
     # Regex for excluded links
-    excludeLink = re.compile('/print.*?|.*?/feed$')
+    excludeLink = re.compile('.*?print.*?|.*?/feed$')
     if excludeLink.match(localLink):
         print 'Link ', urllib.unquote(localLink), ' is excluded. It will not be fetched...'
         return True
