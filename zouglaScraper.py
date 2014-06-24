@@ -10,9 +10,6 @@ import time     ##for time functions and sleep
 from datetime import datetime ##get time
 import urllib   ##url fetching
 import urlparse ##url parse
-from urlparse import urljoin
-from urlparse import urlparse
-from urlparse import urldefrag
 import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
@@ -207,9 +204,9 @@ def getLocalLinks(htmlPage, baseURL):
     regExprString = r'<a href="(.*?)"'
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
-    fullLinks = set([ urljoin(baseURL, s) for s in localLinks ])
+    fullLinks = set([ urlparse.urljoin(baseURL, s) for s in localLinks ])
     # Defragment the full link, remove the hashtag anchor at the end
-    defragedFullLinks = [ urldefrag(s) for s in fullLinks ]
+    defragedFullLinks = [ urlparse.urldefrag(s) for s in fullLinks ]
     return set([ seq[0] for seq in defragedFullLinks ])
 
 def getNewsLinks(htmlPage):
@@ -268,7 +265,7 @@ def main():
             linksFetched.add(link)
             continue
 
-        if urlparse(link).netloc != 'www.zougla.gr':
+        if urlparse.urlparse(link).netloc != 'www.zougla.gr':
             print 'Link', urllib.unquote(link), ' is not in this domain...'
             linksFetched.add(link)
             continue
