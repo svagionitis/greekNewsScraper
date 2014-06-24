@@ -10,8 +10,6 @@ import time     ##for time functions and sleep
 from datetime import datetime ##get time
 import urllib   ##url fetching
 import urlparse ##url parse
-from urlparse import urljoin
-from urlparse import urlparse
 import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
@@ -205,15 +203,13 @@ def writeHTMLToFile(htmlData, filename):
 
 def getLocalLinks(htmlPage, baseURL):
     localLinks = []
-    # First group is the relative link
-    # Second group is the hasgtag anchor
-    regExprString = r'<a href="(/.*?)(#.*?)*"'
-    localLinksTemp = re.findall(regExprString, htmlPage)
-    # Get the link without the hasgtag anchor
-    localLinks = set([ seq[0] for seq in localLinksTemp ])
+    regExprString = r'<a href="(/.*?)"'
+    localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
-    fullLinks = set([ urljoin(baseURL, s) for s in localLinks ])
-    return fullLinks
+    fullLinks = set([ urlparse.urljoin(baseURL, s) for s in localLinks ])
+    # Defragment the full link, remove the hashtag anchor at the end
+    defragedFullLinks = [ urlparse.urldefrag(s) for s in fullLinks ]
+    return set([ seq[0] for seq in defragedFullLinks ])
 
 def getNewsLinks(htmlPage):
     newsLinks = []
@@ -271,7 +267,7 @@ def main():
             linksFetched.add(link)
             continue
 
-        if urlparse(link).netloc != 'www.iefimerida.gr':
+        if urlparse.urlparse(link).netloc != 'www.iefimerida.gr':
             print 'Link', urllib.unquote(link), ' is not in this domain...'
             linksFetched.add(link)
             continue
