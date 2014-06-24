@@ -78,7 +78,7 @@ def getNewsTitle(htmlData):
 
 def getNewsAuthor(htmlData):
     newsAuthor = ''
-    regExprString = r'.*?<div class="author">\s*(.*?)\s*?</div>'
+    regExprString = r'.*?<div class="views-field-value">\s*<span class="field-content"><a href=".*?">(.*?)</a></span>'
     if re.search(regExprString, htmlData):
         newsAuthor = re.search(regExprString, htmlData).group(1)
     else:
@@ -282,7 +282,7 @@ def main():
         htmlData = getUrl(link)
 
         # Check if it's a news link
-        isNewsLink = re.compile('.*?/news/.*?')
+        isNewsLink = re.compile('.*?/news/.*?|.*?/interview/.*?')
         if isNewsLink.match(link):
             writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
 
