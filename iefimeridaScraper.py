@@ -278,7 +278,7 @@ def main():
         htmlData = getUrl(link)
 
         # Check if it's a news link
-        isNewsLink = re.compile('.*?/news/.*?|.*?/interview/.*?')
+        isNewsLink = re.compile('.*?/news/.*?|.*?/interview/.*?|.*?/content/.*?')
         if isNewsLink.match(link):
             writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
 
