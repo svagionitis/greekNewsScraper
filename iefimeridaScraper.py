@@ -10,6 +10,8 @@ import time     ##for time functions and sleep
 from datetime import datetime ##get time
 import urllib   ##url fetching
 import urlparse ##url parse
+from urlparse import urljoin
+from urlparse import urlparse
 import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
@@ -50,14 +52,6 @@ def replaceEntities(inData):
     data = re.sub(r'&percnt;|&#.*?37;', '%', data)
     return data
 
-def constructFullURL(baseURL, localURL):
-    isStartingHttp = re.compile('^http.*?')
-    if isStartingHttp.match(localURL):
-        url = localURL
-    else:
-        url = baseURL + localURL
-    return url
-
 def excludeLocalLinks(localLink):
     # Regex for excluded links
     excludeLink = re.compile('/print.*?|.*?/feed$')
@@ -71,49 +65,83 @@ def excludeLocalLinks(localLink):
 def getNewsTitle(htmlData):
     newsTitle = ''
     regExprString = r'.*?<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
-    newsTitle = re.search(regExprString, htmlData).group(1)
-    newsTitle = replaceEntities(newsTitle)
+    if re.search(regExprString, htmlData):
+        newsTitle = re.search(regExprString, htmlData).group(1)
+        newsTitle = replaceEntities(newsTitle)
+        # Remove any white spaces in the beginning
+        newsTitle = re.sub(r'^[\s]*', '', newsTitle)
+        # Remove any white spaces at the end
+        newsTitle = re.sub(r'[\s]*$', '', newsTitle)
+    else:
+        newsTitle = 'N/A'
     return newsTitle
 
 def getNewsAuthor(htmlData):
-    newsAuthor = 'Anonymous'
+    newsAuthor = ''
+    regExprString = r'.*?<div class="author">\s*(.*?)\s*?</div>'
+    if re.search(regExprString, htmlData):
+        newsAuthor = re.search(regExprString, htmlData).group(1)
+    else:
+        newsAuthor = 'N/A'
     return newsAuthor
 
 def getNewsDescription(htmlData):
     newsDescription = ''
     regExprString = r'<meta name="description" content="(.*?)" />'
-    newsDescription = re.search(regExprString, htmlData).group(1)
-    newsDescription = replaceEntities(newsDescription)
+    # Check if group exists
+    if re.search(regExprString, htmlData):
+        newsDescription = re.search(regExprString, htmlData).group(1)
+        newsDescription = replaceEntities(newsDescription)
+    else:
+        newsDescription = 'N/A'
     return newsDescription
 
 def getNewsKeywords(htmlData):
     newsKeywords = []
     regExprString = r'<meta name="keywords" content="(.*?)" />'
-    newsKeywords = re.search(regExprString, htmlData).group(1)
-    newsKeywords = replaceEntities(newsKeywords)
-    # Split string in commas
-    newsKeywords = re.split(',+', str(newsKeywords))
+    if re.search(regExprString, htmlData):
+        newsKeywords = re.search(regExprString, htmlData).group(1)
+        newsKeywords = replaceEntities(newsKeywords)
+        # Split string in commas
+        newsKeywords = re.split(',+', str(newsKeywords))
+    else:
+        newsKeywords = 'N/A'
     return newsKeywords
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
     regExprString = r'.*?<div class="views-field-created">\s.*?<span class="field-content">(.*?)</span>\s.*?</div>'
-    newsDateCreated = re.search(regExprString, htmlData).group(1)
+    if re.search(regExprString, htmlData):
+        newsDateCreated = re.search(regExprString, htmlData).group(1)
+    else:
+        newsDateCreated = 'N/A'
     return newsDateCreated
+
+def getNewsDateUpdated(htmlData):
+    newsDateUpdated = ''
+    regExprString = r'<div class="date">\s*?<p>\s*?.*?: (.*?)</p>\s*?</div>'
+    if re.search(regExprString, htmlData):
+        newsDateUpdated = re.search(regExprString, htmlData).group(1)
+    else:
+        newsDateUpdated = 'N/A'
+    return newsDateUpdated
 
 def getNewsText(htmlData):
     newsText = ''
     regExprString = r'.*?<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
-    newsText = re.search(regExprString, htmlData).group(1)
-    newsText = replaceEntities(newsText)
-    # Remove the images attached
-    newsText = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsText)
-    # Remove all the html tags, need a clear text
-    newsText = re.sub(r'<[^>]*>', '', newsText)
-    # Remove any white spaces in the beginning
-    newsText = re.sub(r'^[\s]*', '', newsText)
-    # Remove any white spaces at the end
-    newsText = re.sub(r'[\s]*$', '', newsText)
+    if re.search(regExprString, htmlData):
+        newsText = re.search(regExprString, htmlData).group(1)
+        newsText = replaceEntities(newsText)
+        # Remove the images attached
+        newsText = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsText)
+        # Remove all the html tags, need a clear text
+        newsText = re.sub(r'<[^>]*>', '', newsText)
+        # Remove any white spaces in the beginning
+        newsText = re.sub(r'^[\s]*', '', newsText)
+        # Remove any white spaces at the end
+        newsText = re.sub(r'[\s]*$', '', newsText)
+    else:
+        newsText = 'N/A'
     return newsText
 
 def createNewsData(htmlData, fullNewsURL):
@@ -126,6 +154,7 @@ def createNewsData(htmlData, fullNewsURL):
     data['NewsDescription'] = getNewsDescription(htmlData)
     data['NewsKeywords'] = getNewsKeywords(htmlData)
     data['NewsDateCreated'] = getNewsDateCreated(htmlData)
+    data['NewsDateUpdated'] = getNewsDateUpdated(htmlData)
     data['NewsText'] = getNewsText(htmlData)
     data['HashNewsText'] = hashlib.sha1(getNewsText(htmlData)).hexdigest()
     return data
@@ -174,13 +203,17 @@ def writeHTMLToFile(htmlData, filename):
         print 'Problem writing to file ', filename
         sys.exit(1)
 
-def getLocalLinks(htmlPage):
+def getLocalLinks(htmlPage, baseURL):
     localLinks = []
+    # First group is the relative link
+    # Second group is the hasgtag anchor
     regExprString = r'<a href="(/.*?)(#.*?)*"'
     localLinksTemp = re.findall(regExprString, htmlPage)
     # Get the link without the hasgtag anchor
     localLinks = set([ seq[0] for seq in localLinksTemp ])
-    return localLinks
+    # Create the full link
+    fullLinks = set([ urljoin(baseURL, s) for s in localLinks ])
+    return fullLinks
 
 def getNewsLinks(htmlPage):
     newsLinks = []
@@ -209,56 +242,65 @@ def getUrl(url):
 def main():
     baseURL = 'http://www.iefimerida.gr'
 
-    linksToFetch = []
+    linksToFetch = set([])
     linksFetched = set([])
     localLinksRetrieve = set([])
-    # Retrieve the links from the base url
-    baseHtmlData = getUrl(baseURL)
-    linksToFetch = getLocalLinks(baseHtmlData)
+    # Retrieve the links from the base url if the pickle files are not present
+    if os.path.isfile('LinksFetched.pickle') and os.path.isfile('LinksToFetch.pickle'):
+        print 'LinksFetched.pickle and LinksToFetch.pickle are present. Restoring...'
+        linksToFetch = restoreLinksToFetch()
+        linksFetched = restoreLinksFetched()
+    else:
+        baseHtmlData = getUrl(baseURL)
+        linksToFetch = getLocalLinks(baseHtmlData, baseURL)
+        linksFetched.add(baseURL)
 
     print 'Initial unique links to be retrieved ', len(linksToFetch)
 
     # http://stackoverflow.com/questions/16625960/modifying-a-set-while-iterating-over-it
     while linksToFetch:
-        localLink = linksToFetch.pop()
+        link = linksToFetch.pop()
         print 'Remaining links to be fetched ', len(linksToFetch)
 
-        if localLink in linksFetched:
-            print 'Link ', urllib.unquote(localLink), ' already fetched...'
+        if link in linksFetched:
+            print 'Link ', urllib.unquote(link), ' already fetched...'
             continue
 
-        if excludeLocalLinks(localLink):
+        if excludeLocalLinks(link):
             # Add in the fetched although is not fetched!!!
-            linksFetched.add(localLink)
+            linksFetched.add(link)
             continue
 
-        # Construct the full link
-        fullLink = constructFullURL(baseURL, localLink)
-        # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
-        print 'Fetching...', urllib.unquote(fullLink), ' - ', hashlib.sha1(fullLink).hexdigest()
+        if urlparse(link).netloc != 'www.iefimerida.gr':
+            print 'Link', urllib.unquote(link), ' is not in this domain...'
+            linksFetched.add(link)
+            continue
 
-        htmlData = getUrl(fullLink)
+        # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
+        print 'Fetching...', urllib.unquote(link), ' - ', hashlib.sha1(link).hexdigest()
+
+        htmlData = getUrl(link)
 
         # Check if it's a news link
         isNewsLink = re.compile('.*?/news/.*?')
-        if isNewsLink.match(fullLink):
-            writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(fullLink).hexdigest()+'.html')
+        if isNewsLink.match(link):
+            writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
 
             # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
-            jsonData = json.dumps(createNewsData(htmlData, fullLink), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
+            jsonData = json.dumps(createNewsData(htmlData, link), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
             print jsonData
 
-            jsonDump(createNewsData(htmlData, fullLink), 'iefimerida.json')
+            jsonDump(createNewsData(htmlData, link), 'iefimerida.json')
 
         # Get the local links from this page and add them to the linksToFetch
-        newLinksToFetch = getLocalLinks(htmlData)
+        newLinksToFetch = getLocalLinks(htmlData, link)
         print 'Will be added ', len(newLinksToFetch), ' new links'
         linksToFetch.update(newLinksToFetch)
 
         # Add the link if successfully fetched.
-        linksFetched.add(localLink)
+        linksFetched.add(link)
         print 'Total links fetched so far ', len(linksFetched)
 
         nextLinkDelay(11, 21)
