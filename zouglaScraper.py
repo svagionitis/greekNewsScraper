@@ -203,8 +203,6 @@ def writeHTMLToFile(htmlData, filename):
 
 def getLocalLinks(htmlPage, baseURL):
     localLinks = []
-    # First group is ../, second the repeated ../,
-    # third the local link and fourth the hashtag anchor
     regExprString = r'<a href="(.*?)(#.*?)*"'
     localLinksTemp = re.findall(regExprString, htmlPage)
     # Get the link without the hasgtag anchor
