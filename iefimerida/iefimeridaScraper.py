@@ -263,8 +263,6 @@ def main():
             continue
 
         if excludeLocalLinks(link):
-            # Add in the fetched although is not fetched!!!
-            linksFetched.add(link)
             continue
 
         if urlparse.urlparse(link).netloc != 'www.iefimerida.gr':
