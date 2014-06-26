@@ -10,6 +10,7 @@ import time     ##for time functions and sleep
 from datetime import datetime ##get time
 import urllib   ##url fetching
 import urlparse ##url parse
+import posixpath
 import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
@@ -199,12 +200,27 @@ def writeHTMLToFile(htmlData, filename):
         print 'Problem writing to file ', filename
         sys.exit(1)
 
+def expand_url(home, url):
+    join = urlparse.urljoin(home,url)
+    url2 = urlparse.urlparse(join)
+    path = posixpath.normpath(url2[2])
+
+    full = urlparse.urlunparse(
+        (url2.scheme,url2.netloc,path,url2.params,url2.query,url2.fragment)
+        )
+
+    print 'home: ', home, ' url: ', url, ' path: ', path, 'full: ', full
+    return urlparse.urlunparse(
+        (url2.scheme,url2.netloc,path,url2.params,url2.query,url2.fragment)
+        )
+
 def getLocalLinks(htmlPage, baseURL):
     localLinks = []
     regExprString = r'<a href="(.*?)"'
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
-    fullLinks = set([ urlparse.urljoin(baseURL, s) for s in localLinks ])
+    # fullLinks = set([ urlparse.urljoin(baseURL, s) for s in localLinks ])
+    fullLinks = set([ expand_url(baseURL, s) for s in localLinks ])
     # Defragment the full link, remove the hashtag anchor at the end
     defragedFullLinks = [ urlparse.urldefrag(s) for s in fullLinks ]
     return set([ seq[0] for seq in defragedFullLinks ])
@@ -261,8 +277,6 @@ def main():
             continue
 
         if excludeLocalLinks(link):
-            # Add in the fetched although is not fetched!!!
-            linksFetched.add(link)
             continue
 
         if urlparse.urlparse(link).netloc != 'www.zougla.gr':
@@ -278,7 +292,7 @@ def main():
         # Check if it's a news link
         isNewsLink = re.compile('.*?/article/.*?')
         if isNewsLink.match(link):
-            writeHTMLToFile(htmlData, 'zougla/'+hashlib.sha1(link).hexdigest()+'.html')
+            # writeHTMLToFile(htmlData, 'zougla/'+hashlib.sha1(link).hexdigest()+'.html')
 
             # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
@@ -286,7 +300,7 @@ def main():
             jsonData = json.dumps(createNewsData(htmlData, link), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
             print jsonData
 
-            jsonDump(createNewsData(htmlData, link), 'zougla.json')
+            # jsonDump(createNewsData(htmlData, link), 'zougla.json')
 
         # Get the local links from this page and add them to the linksToFetch
         newLinksToFetch = getLocalLinks(htmlData, link)
