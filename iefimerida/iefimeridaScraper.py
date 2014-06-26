@@ -10,6 +10,7 @@ import time     ##for time functions and sleep
 from datetime import datetime ##get time
 import urllib   ##url fetching
 import urlparse ##url parse
+import posixpath
 import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
@@ -201,12 +202,23 @@ def writeHTMLToFile(htmlData, filename):
         print 'Problem writing to file ', filename
         sys.exit(1)
 
+def createAbsoluteURL(home, url):
+    join = urlparse.urljoin(home, url)
+    parse = urlparse.urlparse(join)
+    path = posixpath.normpath(parse[2])
+
+    absolute = urlparse.urlunparse(
+        (parse.scheme, parse.netloc, path, parse.params, parse.query, parse.fragment)
+        )
+
+    return absolute
+
 def getLocalLinks(htmlPage, baseURL):
     localLinks = []
     regExprString = r'<a href="(/.*?)"'
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
-    fullLinks = set([ urlparse.urljoin(baseURL, s) for s in localLinks ])
+    fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
     # Defragment the full link, remove the hashtag anchor at the end
     defragedFullLinks = [ urlparse.urldefrag(s) for s in fullLinks ]
     return set([ seq[0] for seq in defragedFullLinks ])
@@ -278,7 +290,7 @@ def main():
         # Check if it's a news link
         isNewsLink = re.compile('.*?/news/.*?|.*?/interview/.*?|.*?/content/.*?')
         if isNewsLink.match(link):
-            writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
+            # writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
 
             # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')

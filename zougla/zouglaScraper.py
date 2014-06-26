@@ -200,19 +200,16 @@ def writeHTMLToFile(htmlData, filename):
         print 'Problem writing to file ', filename
         sys.exit(1)
 
-def expand_url(home, url):
-    join = urlparse.urljoin(home,url)
-    url2 = urlparse.urlparse(join)
-    path = posixpath.normpath(url2[2])
+def createAbsoluteURL(home, url):
+    join = urlparse.urljoin(home, url)
+    parse = urlparse.urlparse(join)
+    path = posixpath.normpath(parse[2])
 
-    full = urlparse.urlunparse(
-        (url2.scheme,url2.netloc,path,url2.params,url2.query,url2.fragment)
+    absolute = urlparse.urlunparse(
+        (parse.scheme, parse.netloc, path, parse.params, parse.query, parse.fragment)
         )
 
-    print 'home: ', home, ' url: ', url, ' path: ', path, 'full: ', full
-    return urlparse.urlunparse(
-        (url2.scheme,url2.netloc,path,url2.params,url2.query,url2.fragment)
-        )
+    return absolute
 
 def getLocalLinks(htmlPage, baseURL):
     localLinks = []
@@ -220,7 +217,7 @@ def getLocalLinks(htmlPage, baseURL):
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
     # fullLinks = set([ urlparse.urljoin(baseURL, s) for s in localLinks ])
-    fullLinks = set([ expand_url(baseURL, s) for s in localLinks ])
+    fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
     # Defragment the full link, remove the hashtag anchor at the end
     defragedFullLinks = [ urlparse.urldefrag(s) for s in fullLinks ]
     return set([ seq[0] for seq in defragedFullLinks ])
