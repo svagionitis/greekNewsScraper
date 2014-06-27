@@ -53,7 +53,7 @@ def replaceEntities(inData):
 
 def excludeLocalLinks(localLink):
     # Regex for excluded links
-    excludeLink = re.compile('.*?file.ashx.*?|.*?javascript.*?|.*?mailto:.*?|.*?xml.*?')
+    excludeLink = re.compile('.*?file.ashx.*?|.*?javascript.*?|.*?mailto:.*?|.*?xml.*?|.*?rss$')
     if excludeLink.match(localLink):
         print 'Link ', urllib.unquote(localLink), ' is excluded. It will not be fetched...'
         return True
