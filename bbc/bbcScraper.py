@@ -224,13 +224,14 @@ def createAbsoluteURL(home, url):
 
     return absolute
 
-def getLocalLinks(htmlPage, baseURL):
+def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
     localLinks = []
     regExprString = r'<a href="(.*?)"'
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
     fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
-    return fullLinks
+    # Remove the already fetched links and the ones that already will be fetched
+    return set(fullLinks - fetchedLinks - toBeFetchedLinks)
 
 ## Version that uses try/except to print an error message if the
 ## urlopen() fails.
@@ -261,7 +262,7 @@ def main():
         linksFetched = restoreLinksFetched()
     else:
         baseHtmlData = getUrl(baseURL)
-        linksToFetch = getLocalLinks(baseHtmlData, baseURL)
+        linksToFetch = getLocalLinks(baseHtmlData, baseURL, linksFetched, linksToFetch)
         linksFetched.add(baseURL)
 
     print 'Initial unique links to be retrieved ', len(linksToFetch)
@@ -297,12 +298,12 @@ def main():
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
             jsonData = json.dumps(createNewsData(htmlData, link), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
-            print jsonData
+            # print jsonData
 
             # jsonDump(createNewsData(htmlData, link), 'zougla.json')
 
         # Get the local links from this page and add them to the linksToFetch
-        newLinksToFetch = getLocalLinks(htmlData, link)
+        newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
         print 'Will be added ', len(newLinksToFetch), ' new links'
         linksToFetch.update(newLinksToFetch)
 

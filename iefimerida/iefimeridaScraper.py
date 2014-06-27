@@ -215,21 +215,17 @@ def createAbsoluteURL(home, url):
     parse = urlparse.urlparse(join)
     path = posixpath.normpath(parse[2])
 
-    absolute = urlparse.urlunparse(
-        (parse.scheme, parse.netloc, path, parse.params, parse.query, parse.fragment)
-        )
+    absolute = urlparse.urlunparse((parse.scheme, parse.netloc, path, parse.params, parse.query, None))
 
     return absolute
 
-def getLocalLinks(htmlPage, baseURL):
+def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
     localLinks = []
     regExprString = r'<a href="(/.*?)"'
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
     fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
-    # Defragment the full link, remove the hashtag anchor at the end
-    defragedFullLinks = [ urlparse.urldefrag(s) for s in fullLinks ]
-    return set([ seq[0] for seq in defragedFullLinks ])
+    return set(fullLinks - fetchedLinks - toBeFetchedLinks)
 
 def getNewsLinks(htmlPage):
     newsLinks = []
@@ -268,7 +264,7 @@ def main():
         linksFetched = restoreLinksFetched()
     else:
         baseHtmlData = getUrl(baseURL)
-        linksToFetch = getLocalLinks(baseHtmlData, baseURL)
+        linksToFetch = getLocalLinks(baseHtmlData, baseURL, linksFetched, linksToFetch)
         linksFetched.add(baseURL)
 
     print 'Initial unique links to be retrieved ', len(linksToFetch)
@@ -309,7 +305,7 @@ def main():
             jsonDump(createNewsData(htmlData, link), 'iefimerida.json')
 
         # Get the local links from this page and add them to the linksToFetch
-        newLinksToFetch = getLocalLinks(htmlData, link)
+        newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
         print 'Will be added ', len(newLinksToFetch), ' new links'
         linksToFetch.update(newLinksToFetch)
 
