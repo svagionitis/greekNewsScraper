@@ -77,7 +77,7 @@ def getNewsTitle(htmlData):
 
 def getNewsAuthor(htmlData):
     newsAuthor = ''
-    regExprString = r'.*?<div class="author">\s*(.*?)\s*?</div>'
+    regExprString = r'<div class="author">\s*(.*?)\s*?</div>'
     if re.search(regExprString, htmlData):
         newsAuthor = re.search(regExprString, htmlData).group(1)
     else:
@@ -127,7 +127,7 @@ def getNewsDateUpdated(htmlData):
 
 def getNewsText(htmlData):
     newsText = ''
-    regExprString = r'.*?<div class="story-body">[.\s\S]*?<p class="introduction" id="story_continues_1">([.\s\S]*?)\s.*?</div><!-- / story-body -->'
+    regExprString = r'<div class="story-body">[.\s\S]*?<p class="introduction" id="story_continues_1">([.\s\S]*?)\s.*?</div><!-- / story-body -->'
     if re.search(regExprString, htmlData):
         newsText = re.search(regExprString, htmlData).group(1)
         newsText = replaceEntities(newsText)
@@ -148,7 +148,7 @@ def getNewsText(htmlData):
 
 def createNewsData(htmlData, fullNewsURL):
     data = {}
-    print 'Parsing html page for data gathering...'
+
     data['DateRetrieved'] = str(datetime.now())
 
     data['NewsLink'] = urllib.unquote(fullNewsURL)
@@ -287,7 +287,6 @@ def main():
         print 'Fetching...', urllib.unquote(link), ' - ', hashlib.sha1(link).hexdigest()
 
         htmlData = getUrl(link)
-        print 'Link ', urllib.unquote(link), ' fetched'
 
         # Check if it's a news link
         isNewsLink = re.compile('.*?/news/.*?|.*?/sport/.*?|.*?/weather/.*?|.*?/tv/.*?|.*?/radio/.*?|.*?/science/.*?|.*?/nature/.*?')
