@@ -63,7 +63,7 @@ def excludeLocalLinks(localLink):
 
 def getNewsTitle(htmlData):
     newsTitle = ''
-    regExprString = r'.*?<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
+    regExprString = r'<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
     if re.search(regExprString, htmlData):
         newsTitle = re.search(regExprString, htmlData).group(1)
         newsTitle = replaceEntities(newsTitle)
@@ -77,7 +77,7 @@ def getNewsTitle(htmlData):
 
 def getNewsAuthor(htmlData):
     newsAuthor = ''
-    regExprString = r'.*?<div class="views-field-value">\s*<span class="field-content"><a href=".*?">(.*?)</a></span>'
+    regExprString = r'<div class="views-field-value">\s*<span class="field-content"><a href=".*?">(.*?)</a></span>'
     if re.search(regExprString, htmlData):
         newsAuthor = re.search(regExprString, htmlData).group(1)
     else:
@@ -109,7 +109,7 @@ def getNewsKeywords(htmlData):
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
-    regExprString = r'.*?<div class="views-field-created">\s.*?<span class="field-content">(.*?)</span>\s.*?</div>'
+    regExprString = r'<div class="views-field-created">\s.*?<span class="field-content">(.*?)</span>\s.*?</div>'
     if re.search(regExprString, htmlData):
         newsDateCreated = re.search(regExprString, htmlData).group(1)
     else:
@@ -127,7 +127,7 @@ def getNewsDateUpdated(htmlData):
 
 def getNewsText(htmlData):
     newsText = ''
-    regExprString = r'.*?<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
+    regExprString = r'<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
     if re.search(regExprString, htmlData):
         newsText = re.search(regExprString, htmlData).group(1)
         newsText = replaceEntities(newsText)
@@ -146,16 +146,24 @@ def getNewsText(htmlData):
 def createNewsData(htmlData, fullNewsURL):
     data = {}
     data['DateRetrieved'] = str(datetime.now())
+
     data['NewsLink'] = urllib.unquote(fullNewsURL)
     data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
+
     data['NewsTitle'] = getNewsTitle(htmlData)
+
     data['NewsAuthor'] = getNewsAuthor(htmlData)
+
     data['NewsDescription'] = getNewsDescription(htmlData)
+
     data['NewsKeywords'] = getNewsKeywords(htmlData)
+
     data['NewsDateCreated'] = getNewsDateCreated(htmlData)
     data['NewsDateUpdated'] = getNewsDateUpdated(htmlData)
-    data['NewsText'] = getNewsText(htmlData)
-    data['HashNewsText'] = hashlib.sha1(getNewsText(htmlData)).hexdigest()
+
+    newsText = getNewsText(htmlData)
+    data['NewsText'] = newsText
+    data['HashNewsText'] = hashlib.sha1(newsText).hexdigest()
     return data
 
 def jsonDump(data, jsonFilename):
