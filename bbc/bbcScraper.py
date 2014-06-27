@@ -289,7 +289,7 @@ def main():
         htmlData = getUrl(link)
 
         # Check if it's a news link
-        isNewsLink = re.compile('.*?/news/.*?|.*?/sport/.*?|.*?/weather/.*?|.*?/tv/.*?|.*?/radio/.*?|.*?/science/.*?|.*?/nature/.*?')
+        isNewsLink = re.compile('.*?/news/.*?-\d+$|.*?/sport/.*?\d{2,}|.*?/weather/.*?|.*?/tv/.*?|.*?/radio/.*?|.*?/science/.*?|.*?/nature/.*?')
         if isNewsLink.match(link):
             # writeHTMLToFile(htmlData, 'zougla/'+hashlib.sha1(link).hexdigest()+'.html')
 
