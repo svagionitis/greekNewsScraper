@@ -109,9 +109,9 @@ def getNewsKeywords(htmlData):
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
-    regExprString = r'<div class="top_date">\s*?.*?: (.*?)\s*?</div>'
+    regExprString = r'<span class="story-date">\s*?<span class="date">(.*?)</span>\s*?<span class="time-text">Last updated at </span><span class="time">(.*?)</span>'
     if re.search(regExprString, htmlData):
-        newsDateCreated = re.search(regExprString, htmlData).group(1)
+        newsDateCreated = re.search(regExprString, htmlData).group(1) + ' ' + re.search(regExprString, htmlData).group(2)
     else:
         newsDateCreated = 'N/A'
     return newsDateCreated
@@ -148,17 +148,26 @@ def getNewsText(htmlData):
 
 def createNewsData(htmlData, fullNewsURL):
     data = {}
+    print 'Parsing html page for data gathering...'
     data['DateRetrieved'] = str(datetime.now())
+
     data['NewsLink'] = urllib.unquote(fullNewsURL)
     data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
+
     data['NewsTitle'] = getNewsTitle(htmlData)
+
     data['NewsAuthor'] = getNewsAuthor(htmlData)
+
     data['NewsDescription'] = getNewsDescription(htmlData)
+
     data['NewsKeywords'] = getNewsKeywords(htmlData)
+
     data['NewsDateCreated'] = getNewsDateCreated(htmlData)
     data['NewsDateUpdated'] = getNewsDateUpdated(htmlData)
-    data['NewsText'] = getNewsText(htmlData)
-    data['HashNewsText'] = hashlib.sha1(getNewsText(htmlData)).hexdigest()
+
+    newsText = getNewsText(htmlData)
+    data['NewsText'] = newsText
+    data['HashNewsText'] = hashlib.sha1(newsText).hexdigest()
     return data
 
 def jsonDump(data, jsonFilename):
@@ -210,9 +219,8 @@ def createAbsoluteURL(home, url):
     parse = urlparse.urlparse(join)
     path = posixpath.normpath(parse[2])
 
-    absolute = urlparse.urlunparse(
-        (parse.scheme, parse.netloc, path, parse.params, parse.query, parse.fragment)
-        )
+    # Exclude fragment from the link
+    absolute = urlparse.urlunparse((parse.scheme, parse.netloc, path, parse.params, parse.query, None))
 
     return absolute
 
@@ -222,17 +230,7 @@ def getLocalLinks(htmlPage, baseURL):
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
     fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
-    # Defragment the full link, remove the hashtag anchor at the end
-    defragedFullLinks = [ urlparse.urldefrag(s) for s in fullLinks ]
-    return set([ seq[0] for seq in defragedFullLinks ])
-
-def getNewsLinks(htmlPage):
-    newsLinks = []
-    regExprString = r'<a href="(/news/.*?)(#.*?)*"'
-    newsLinksTemp = re.findall(regExprString, htmlPage)
-    # Use set in order to get the unique elements and not dublicates
-    newsLinks = set([ seq[0] for seq in newsLinksTemp ])
-    return newsLinks
+    return fullLinks
 
 ## Version that uses try/except to print an error message if the
 ## urlopen() fails.
@@ -289,6 +287,7 @@ def main():
         print 'Fetching...', urllib.unquote(link), ' - ', hashlib.sha1(link).hexdigest()
 
         htmlData = getUrl(link)
+        print 'Link ', urllib.unquote(link), ' fetched'
 
         # Check if it's a news link
         isNewsLink = re.compile('.*?/news/.*?|.*?/sport/.*?|.*?/weather/.*?|.*?/tv/.*?|.*?/radio/.*?|.*?/science/.*?|.*?/nature/.*?')
