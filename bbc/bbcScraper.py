@@ -109,30 +109,32 @@ def getNewsKeywords(htmlData):
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
-    regExprString = r'<span class="story-date">\s*?<span class="date">(.*?)</span>\s*?<span class="time-text">Last updated at </span><span class="time">(.*?)</span>'
+    regExprString = r'<meta property="rnews:datePublished" content="(.*?)"/>'
     if re.search(regExprString, htmlData):
-        newsDateCreated = re.search(regExprString, htmlData).group(1) + ' ' + re.search(regExprString, htmlData).group(2)
+        newsDateCreated = re.search(regExprString, htmlData).group(1)
     else:
         newsDateCreated = 'N/A'
     return newsDateCreated
 
 def getNewsDateUpdated(htmlData):
     newsDateUpdated = ''
-    regExprString = r'<div class="date">\s*?<p>\s*?.*?: (.*?)</p>\s*?</div>'
+    regExprString = r'<span class="date">(.*?)</span>\s*?[.\s\S]*?<span class="time">(.*?)</span>'
     if re.search(regExprString, htmlData):
-        newsDateUpdated = re.search(regExprString, htmlData).group(1)
+        newsDateUpdated = re.search(regExprString, htmlData).group(1) + ' ' + re.search(regExprString, htmlData).group(2)
     else:
         newsDateUpdated = 'N/A'
     return newsDateUpdated
 
 def getNewsText(htmlData):
     newsText = ''
-    regExprString = r'<div class="story-body">[.\s\S]*?<p class="introduction" id="story_continues_1">([.\s\S]*?)\s.*?</div><!-- / story-body -->'
+    regExprString = r'<div class="story-body">[.\s\S]*?<p class="introduction".*?>([.\s\S]*?)\s.*?</div><!-- / story-body -->'
     if re.search(regExprString, htmlData):
         newsText = re.search(regExprString, htmlData).group(1)
         newsText = replaceEntities(newsText)
         # Remove the noscript attached
-        newsText = re.sub(r'<noscript>[.\s\S]*?</noscript>', '', newsText)
+        newsText = re.sub(r'<.*?script>[.\s\S]*?</.*?script>', '', newsText)
+        # Remove the style
+        newsText = re.sub(r'<style.*?>[.\s\S]*?</style>', '', newsText)
         # Remove all the html tags, need a clear text
         newsText = re.sub(r'<[^>]*>', '', newsText)
         # Remove repeating of white characters
@@ -250,7 +252,7 @@ def getUrl(url):
 
 # Gather our code in a main() function
 def main():
-    baseURL = 'http://www.bbc.co.uk/'
+    baseURL = 'http://www.bbc.co.uk/news/'
 
     linksToFetch = set([])
     linksFetched = set([])
@@ -290,7 +292,7 @@ def main():
         htmlData = getUrl(link)
 
         # Check if it's a news link
-        isNewsLink = re.compile('.*?/news/.*?-\d+$|.*?/sport/.*?\d{2,}|.*?/weather/.*?|.*?/tv/.*?|.*?/radio/.*?|.*?/science/.*?|.*?/nature/.*?')
+        isNewsLink = re.compile('.*?/news/.*?-\d+$|.*?/sport/.*?\d{2,}')
         if isNewsLink.match(link):
             # writeHTMLToFile(htmlData, 'zougla/'+hashlib.sha1(link).hexdigest()+'.html')
 
@@ -298,7 +300,7 @@ def main():
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
             jsonData = json.dumps(createNewsData(htmlData, link), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
-            # print jsonData
+            print jsonData
 
             # jsonDump(createNewsData(htmlData, link), 'zougla.json')
 
