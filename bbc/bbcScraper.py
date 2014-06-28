@@ -233,7 +233,7 @@ def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
     # Create the full link
     fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
     # Remove the already fetched links and the ones that already will be fetched
-    return set(fullLinks - fetchedLinks - toBeFetchedLinks)
+    return set(fullLinks - (fetchedLinks | toBeFetchedLinks))
 
 ## Version that uses try/except to print an error message if the
 ## urlopen() fails.
