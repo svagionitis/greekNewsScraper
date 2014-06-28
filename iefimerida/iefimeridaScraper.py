@@ -53,7 +53,7 @@ def replaceEntities(inData):
 
 def excludeLocalLinks(localLink):
     # Regex for excluded links
-    excludeLink = re.compile('.*?print.*?|.*?/feed$|.*?pdf$')
+    excludeLink = re.compile('.*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$')
     if excludeLink.match(localLink):
         print 'Link ', urllib.unquote(localLink), ' is excluded. It will not be fetched...'
         return True
@@ -221,11 +221,11 @@ def createAbsoluteURL(home, url):
 
 def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
     localLinks = []
-    regExprString = r'<a href="(/.*?)"'
+    regExprString = r'<a href="(.*?)"'
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
     fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
-    return set(fullLinks - fetchedLinks - toBeFetchedLinks)
+    return set(fullLinks - (fetchedLinks | toBeFetchedLinks))
 
 def getNewsLinks(htmlPage):
     newsLinks = []
