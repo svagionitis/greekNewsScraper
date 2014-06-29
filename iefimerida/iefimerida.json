@@ -1,32 +1,17 @@
 {
-def excludeLocalLinks(localLink):
-    excludeLink = re.compile('.*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?png$')
-
-def getNewsTitle(htmlData):
-    regExprString = r'<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
-
-def getNewsAuthor(htmlData):
-    regExprString = r'<div class="views-field-value">\s*<span class="field-content"><a href=".*?">(.*?)</a></span>'
-
-def getNewsDescription(htmlData):
-    regExprString = r'<meta name="description" content="(.*?)" />'
-
-def getNewsKeywords(htmlData):
-    regExprString = r'<meta name="keywords" content="(.*?)" />'
-
-def getNewsDateCreated(htmlData):
-    regExprString = r'<div class="views-field-created">\s.*?<span class="field-content">(.*?)</span>\s.*?</div>'
-
-def getNewsDateUpdated(htmlData):
-    regExprString = r'<div class="date">\s*?<p>\s*?.*?: (.*?)</p>\s*?</div>'
-
-def getNewsText(htmlData):
-    regExprString = r'<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
-
-def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
-    regExprString = r'<a href="(.*?)"'
-
-    baseURL = 'http://www.iefimerida.gr'
-
-        isNewsLink = re.compile('.*?/news/.*?|.*?/interview/.*?|.*?/content/.*?')
+    "BaseURL": "http://www.iefimerida.gr",
+    "NewsRegEx": {
+        "NewsTitle":        "<div class=\"views-field-title\">\s.*?<span class=\"field-content\"><h1>(.*?)</h1></span>\s.*?</div>",
+        "NewsAuthor":       "<div class=\"views-field-value\">\s*<span class=\"field-content\"><a href=\".*?\">(.*?)</a></span>",
+        "NewsDescription":  "<meta name=\"description\" content=\"(.*?)\" />",
+        "NewsKeywords":     "<meta name=\"keywords\" content=\"(.*?)\" />",
+        "NewsDateCreated":  "<div class=\"views-field-created\">\s.*?<span class=\"field-content\">(.*?)</span>\s.*?</div>",
+        "NewsDateUpdated":  "<div class=\"date\">\s*?<p>\s*?.*?: (.*?)</p>\s*?</div>",
+        "NewsText":         "<div class=\"content clear-block\">\s([.\s\S]*?)\s.*?</div>",
+    },
+    "LinksRegEx": {
+        "LocalLinks":       "<a href=\"(.*?)\"",
+        "LinksExcluded":    ".*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?png$",
+        "LinksIncluded":    ".*?/news/.*?|.*?/interview/.*?|.*?/content/.*?",
+    }
 }
