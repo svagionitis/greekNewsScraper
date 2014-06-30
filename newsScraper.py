@@ -23,6 +23,11 @@ from urllib import FancyURLopener
 class MyOpener(FancyURLopener):
     version = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
+def readJsonConfFile(filename):
+    jsonConf = {}
+    with open(filename)  as jsonFileHandle:
+        jsonConf = json.load(jsonFileHandle)
+        print jsonConf
 
 def readFile(filename):
     """Read a filename. Output is the content of the file as a string"""
@@ -252,6 +257,8 @@ def getUrl(url):
 
 # Gather our code in a main() function
 def main():
+    readJsonConfFile('iefimerida/iefimerida.json')
+    sys.exit(1)
     baseURL = 'http://www.iefimerida.gr'
 
     linksToFetch = set([])
