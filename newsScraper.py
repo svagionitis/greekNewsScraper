@@ -186,22 +186,22 @@ def nextLinkDelay(startDelay, endDelay):
 
 
 def dumpLinksToFetch(LinksToFetch):
-    with open('LinksToFetch.pickle', 'wb') as pickleFileHandle:
+    with open(jsonConf['Filenames']['LinksToFetch'], 'wb') as pickleFileHandle:
         pickle.dump(LinksToFetch, pickleFileHandle)
 
 def dumpLinksFetched(LinksFetched):
-    with open('LinksFetched.pickle', 'wb') as pickleFileHandle:
+    with open(jsonConf['Filenames']['LinksFetched'], 'wb') as pickleFileHandle:
         pickle.dump(LinksFetched, pickleFileHandle)
 
 def restoreLinksToFetch():
     restoredLinksToFetch = set([])
-    with open('LinksToFetch.pickle', 'rb') as fileHandle:
+    with open(jsonConf['Filenames']['LinksToFetch'], 'rb') as fileHandle:
         restoredLinksToFetch = pickle.load(fileHandle)
     return restoredLinksToFetch
 
 def restoreLinksFetched():
     restoredLinksFetched = set([])
-    with open('LinksFetched.pickle', 'rb') as fileHandle:
+    with open(jsonConf['Filenames']['LinksFetched'], 'rb') as fileHandle:
         restoredLinksFetched = pickle.load(fileHandle)
     return restoredLinksFetched
 
@@ -261,8 +261,8 @@ def main():
     linksFetched = set([])
     localLinksRetrieve = set([])
     # Retrieve the links from the base url if the pickle files are not present
-    if os.path.isfile('LinksFetched.pickle') and os.path.isfile('LinksToFetch.pickle'):
-        print 'LinksFetched.pickle and LinksToFetch.pickle are present. Restoring...'
+    if os.path.isfile(jsonConf['Filenames']['LinksFetched']) and os.path.isfile(jsonConf['Filenames']['LinksToFetch']):
+        print jsonConf['Filenames']['LinksFetched'], 'and',  jsonConf['Filenames']['LinksToFetch'], 'are present. Restoring...'
         linksToFetch = restoreLinksToFetch()
         linksFetched = restoreLinksFetched()
     else:
