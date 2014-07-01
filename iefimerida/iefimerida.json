@@ -3,7 +3,7 @@
     "Filenames": {
         "LinksFetched": "LinksFetched.pickle",
         "LinksToFetch": "LinksToFetch.pickle",
-        "NewsJSON":     "iefimerida.json"
+        "NewsJSON":     "iefimerida-news.json"
     },
     "NewsRegEx": {
         "NewsTitle":        "<div class=\"views-field-title\">\\s.*?<span class=\"field-content\"><h1>(.*?)</h1></span>\\s.*?</div>",
