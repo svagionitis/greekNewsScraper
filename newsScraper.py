@@ -62,7 +62,7 @@ def excludeLocalLinks(localLink):
     # Regex for excluded links
     excludeLink = re.compile(jsonConf['LinksRegEx']['LinksExcluded'])
     if excludeLink.match(localLink):
-        print 'Link ', urllib.unquote(localLink), ' is excluded. It will not be fetched...'
+        print 'Link ', urllib.unquote(localLink).encode('latin-1'), ' is excluded. It will not be fetched...'
         return True
     else:
         return False
@@ -246,7 +246,7 @@ def getUrl(url):
         if ufile.info().gettype() == 'text/html':
             return ufile.read()
     except IOError:
-        print 'Problem reading url:', urllib.unquote(url)
+        print 'Problem reading url:', urllib.unquote(url).encode('latin-1')
         sys.exit(1)
 
 
@@ -278,14 +278,14 @@ def main():
         print 'Remaining links to be fetched ', len(linksToFetch)
 
         if link in linksFetched:
-            print 'Link ', urllib.unquote(link), ' already fetched...'
+            print 'Link ', urllib.unquote(link).encode('latin-1'), ' already fetched...'
             continue
 
         if excludeLocalLinks(link):
             continue
 
         if urlparse.urlparse(link).netloc != 'www.iefimerida.gr':
-            print 'Link', urllib.unquote(link), ' is not in this domain...'
+            print 'Link', urllib.unquote(link).encode('latin-1'), ' is not in this domain...'
             linksFetched.add(link)
             continue
 
@@ -304,7 +304,7 @@ def main():
 
             # data = repr(createNewsData(htmlData, link)).decode("unicode-escape").encode('latin-1')
             data = createNewsData(htmlData, link)
-            jsonData = json.dumps(repr(data).decode("unicode-escape").encode('latin-1'), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
+            jsonData = json.dumps((repr(data).decode("unicode-escape").encode('latin-1')), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
             print jsonData
 
             jsonDump(repr(data).decode("unicode-escape").encode('latin-1'), 'iefimerida.json')
