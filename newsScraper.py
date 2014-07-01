@@ -19,15 +19,17 @@ import json     ##json to serialize data, web friendly?? and read json config fi
 # http://wolfprojects.altervista.org/changeua.php
 from urllib import FancyURLopener
 
+# Global variable for json conf file
+jsonConf = {}
+
 # Use google bot as user agent
 class MyOpener(FancyURLopener):
     version = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
 def readJsonConfFile(filename):
-    jsonConf = {}
+    global jsonConf
     with open(filename)  as jsonFileHandle:
         jsonConf = json.load(jsonFileHandle)
-        print jsonConf
 
 def readFile(filename):
     """Read a filename. Output is the content of the file as a string"""
@@ -58,7 +60,7 @@ def replaceEntities(inData):
 
 def excludeLocalLinks(localLink):
     # Regex for excluded links
-    excludeLink = re.compile('.*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?png$')
+    excludeLink = re.compile(jsonConf['LinksRegEx']['LinksExcluded'])
     if excludeLink.match(localLink):
         print 'Link ', urllib.unquote(localLink), ' is excluded. It will not be fetched...'
         return True
@@ -68,9 +70,9 @@ def excludeLocalLinks(localLink):
 
 def getNewsTitle(htmlData):
     newsTitle = ''
-    regExprString = r'<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
-    if re.search(regExprString, htmlData):
-        newsTitle = re.search(regExprString, htmlData).group(1)
+    newsTitleRegEx = re.compile(jsonConf['NewsRegEx']['NewsTitle'])
+    if newsTitleRegEx.search(htmlData):
+        newsTitle = newsTitleRegEx.search(htmlData).group(1)
         newsTitle = replaceEntities(newsTitle)
         # Remove any white spaces in the beginning
         newsTitle = re.sub(r'^[\s]*', '', newsTitle)
@@ -226,7 +228,7 @@ def createAbsoluteURL(home, url):
 
 def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
     localLinks = []
-    regExprString = r'<a href="(.*?)"'
+    regExprString = jsonConf['LinksRegEx']['LocalLinks']
     localLinks = re.findall(regExprString, htmlPage)
     # Create the full link
     fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
@@ -251,15 +253,16 @@ def getUrl(url):
         if ufile.info().gettype() == 'text/html':
             return ufile.read()
     except IOError:
-        print 'Problem reading url:', url
+        print 'Problem reading url:', urllib.unquote(url)
         sys.exit(1)
 
 
 # Gather our code in a main() function
 def main():
+    # Read json conf files
     readJsonConfFile('iefimerida/iefimerida.json')
-    sys.exit(1)
-    baseURL = 'http://www.iefimerida.gr'
+
+    baseURL = jsonConf['BaseURL']
 
     linksToFetch = set([])
     linksFetched = set([])
@@ -294,22 +297,24 @@ def main():
             continue
 
         # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
-        print 'Fetching...', urllib.unquote(link), ' - ', hashlib.sha1(link).hexdigest()
+        print 'Fetching...', urllib.unquote(link).encode('latin-1'), ' - ', hashlib.sha1(link).hexdigest()
 
         htmlData = getUrl(link)
 
         # Check if it's a news link
-        isNewsLink = re.compile('.*?/news/.*?|.*?/interview/.*?|.*?/content/.*?')
+        isNewsLink = re.compile(jsonConf['LinksRegEx']['LinksIncluded'])
         if isNewsLink.match(link):
             # writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
 
             # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
-            jsonData = json.dumps(createNewsData(htmlData, link), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
+            # data = repr(createNewsData(htmlData, link)).decode("unicode-escape").encode('latin-1')
+            data = createNewsData(htmlData, link)
+            jsonData = json.dumps(repr(data).decode("unicode-escape").encode('latin-1'), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
             print jsonData
 
-            jsonDump(createNewsData(htmlData, link), 'iefimerida.json')
+            jsonDump(repr(data).decode("unicode-escape").encode('latin-1'), 'iefimerida.json')
 
         # Get the local links from this page and add them to the linksToFetch
         newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
