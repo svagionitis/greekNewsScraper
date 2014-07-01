@@ -1,5 +1,10 @@
 {
     "BaseURL": "http://www.iefimerida.gr",
+    "Filenames": {
+        "LinksFetched": "LinksFetched.pickle",
+        "LinksToFetch": "LinksToFetch.pickle",
+        "NewsJSON":     "iefimerida.json"
+    },
     "NewsRegEx": {
         "NewsTitle":        "<div class=\"views-field-title\">\\s.*?<span class=\"field-content\"><h1>(.*?)</h1></span>\\s.*?</div>",
         "NewsAuthor":       "<div class=\"views-field-value\">\\s*<span class=\"field-content\"><a href=\".*?\">(.*?)</a></span>",
