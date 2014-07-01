@@ -307,7 +307,7 @@ def main():
             jsonData = json.dumps((repr(data).decode("unicode-escape").encode('latin-1')), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
             print jsonData
 
-            jsonDump(repr(data).decode("unicode-escape").encode('latin-1'), 'iefimerida.json')
+            jsonDump(repr(data).decode("unicode-escape").encode('latin-1'), jsonConf['Filenames']['NewsJSON'])
 
         # Get the local links from this page and add them to the linksToFetch
         newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
