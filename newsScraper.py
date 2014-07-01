@@ -84,19 +84,19 @@ def getNewsTitle(htmlData):
 
 def getNewsAuthor(htmlData):
     newsAuthor = ''
-    regExprString = r'<div class="views-field-value">\s*<span class="field-content"><a href=".*?">(.*?)</a></span>'
-    if re.search(regExprString, htmlData):
-        newsAuthor = re.search(regExprString, htmlData).group(1)
+    newsAuthorRegEx = re.compile(jsonConf['NewsRegEx']['NewsAuthor'])
+    if newsAuthorRegEx.search(htmlData):
+        newsAuthor = newsAuthorRegEx.search(htmlData).group(1)
     else:
         newsAuthor = 'N/A'
     return newsAuthor
 
 def getNewsDescription(htmlData):
     newsDescription = ''
-    regExprString = r'<meta name="description" content="(.*?)" />'
+    newsDescriptionRegEx = re.compile(jsonConf['NewsRegEx']['NewsDescription'])
     # Check if group exists
-    if re.search(regExprString, htmlData):
-        newsDescription = re.search(regExprString, htmlData).group(1)
+    if newsDescriptionRegEx.search(htmlData):
+        newsDescription = newsDescriptionRegEx.search(htmlData).group(1)
         newsDescription = replaceEntities(newsDescription)
     else:
         newsDescription = 'N/A'
@@ -104,9 +104,9 @@ def getNewsDescription(htmlData):
 
 def getNewsKeywords(htmlData):
     newsKeywords = []
-    regExprString = r'<meta name="keywords" content="(.*?)" />'
-    if re.search(regExprString, htmlData):
-        newsKeywords = re.search(regExprString, htmlData).group(1)
+    newsKeywordsRegEx = re.compile(jsonConf['NewsRegEx']['NewsKeywords'])
+    if newsKeywordsRegEx.search(htmlData):
+        newsKeywords = newsKeywordsRegEx.search(htmlData).group(1)
         newsKeywords = replaceEntities(newsKeywords)
         # Split string in commas
         newsKeywords = re.split(',+', str(newsKeywords))
@@ -116,18 +116,18 @@ def getNewsKeywords(htmlData):
 
 def getNewsDateCreated(htmlData):
     newsDateCreated = ''
-    regExprString = r'<div class="views-field-created">\s.*?<span class="field-content">(.*?)</span>\s.*?</div>'
-    if re.search(regExprString, htmlData):
-        newsDateCreated = re.search(regExprString, htmlData).group(1)
+    newsDateCreatedRegEx = re.compile(jsonConf['NewsRegEx']['NewsDateCreated'])
+    if newsDateCreatedRegEx.search(htmlData):
+        newsDateCreated = newsDateCreatedRegEx.search(htmlData).group(1)
     else:
         newsDateCreated = 'N/A'
     return newsDateCreated
 
 def getNewsDateUpdated(htmlData):
     newsDateUpdated = ''
-    regExprString = r'<div class="date">\s*?<p>\s*?.*?: (.*?)</p>\s*?</div>'
-    if re.search(regExprString, htmlData):
-        newsDateUpdated = re.search(regExprString, htmlData).group(1)
+    newsDateUpdatedRegEx = re.compile(jsonConf['NewsRegEx']['NewsDateUpdated'])
+    if newsDateUpdatedRegEx.search(htmlData):
+        newsDateUpdated = newsDateUpdatedRegEx.search(htmlData).group(1)
     else:
         newsDateUpdated = 'N/A'
     return newsDateUpdated
@@ -135,8 +135,9 @@ def getNewsDateUpdated(htmlData):
 def getNewsText(htmlData):
     newsText = ''
     regExprString = r'<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
-    if re.search(regExprString, htmlData):
-        newsText = re.search(regExprString, htmlData).group(1)
+    newsTextRegEx = re.compile(jsonConf['NewsRegEx']['NewsText'])
+    if newsTextRegEx.search(htmlData):
+        newsText = newsTextRegEx.search(htmlData).group(1)
         newsText = replaceEntities(newsText)
         # Remove the images attached
         newsText = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsText)
@@ -233,14 +234,6 @@ def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
     # Create the full link
     fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
     return set(fullLinks - (fetchedLinks | toBeFetchedLinks))
-
-def getNewsLinks(htmlPage):
-    newsLinks = []
-    regExprString = r'<a href="(/news/.*?)(#.*?)*"'
-    newsLinksTemp = re.findall(regExprString, htmlPage)
-    # Use set in order to get the unique elements and not dublicates
-    newsLinks = set([ seq[0] for seq in newsLinksTemp ])
-    return newsLinks
 
 ## Version that uses try/except to print an error message if the
 ## urlopen() fails.
