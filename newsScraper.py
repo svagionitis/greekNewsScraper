@@ -134,7 +134,6 @@ def getNewsDateUpdated(htmlData):
 
 def getNewsText(htmlData):
     newsText = ''
-    regExprString = r'<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
     newsTextRegEx = re.compile(jsonConf['NewsRegEx']['NewsText'])
     if newsTextRegEx.search(htmlData):
         newsText = newsTextRegEx.search(htmlData).group(1)
@@ -155,7 +154,7 @@ def createNewsData(htmlData, fullNewsURL):
     data = {}
     data['DateRetrieved'] = str(datetime.now())
 
-    data['NewsLink'] = urllib.unquote(fullNewsURL)
+    data['NewsLink'] = urllib.unquote(fullNewsURL).encode('latin-1')
     data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
 
     data['NewsTitle'] = getNewsTitle(htmlData)
@@ -176,7 +175,7 @@ def createNewsData(htmlData, fullNewsURL):
 
 def jsonDump(data, jsonFilename):
     with open(jsonFilename, 'a+') as jsonFileHandle:
-        json.dump( data, jsonFileHandle, sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
+        json.dump( data, jsonFileHandle, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
 
 def nextLinkDelay(startDelay, endDelay):
     randomNum = 0
@@ -303,11 +302,10 @@ def main():
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
             data = createNewsData(htmlData, link)
-            dataDecoded = repr(data).decode("unicode-escape").encode('latin-1')
-            jsonData = json.dumps(dataDecoded, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
+            jsonData = json.dumps(data, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
             print jsonData
 
-            jsonDump(dataDecoded, jsonConf['Filenames']['NewsJSON'])
+            jsonDump(data, jsonConf['Filenames']['NewsJSON'])
 
         # Get the local links from this page and add them to the linksToFetch
         newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
