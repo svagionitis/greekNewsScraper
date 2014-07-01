@@ -302,12 +302,12 @@ def main():
             # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
-            # data = repr(createNewsData(htmlData, link)).decode("unicode-escape").encode('latin-1')
             data = createNewsData(htmlData, link)
-            jsonData = json.dumps((repr(data).decode("unicode-escape").encode('latin-1')), sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': '))
+            dataDecoded = repr(data).decode("unicode-escape").encode('latin-1')
+            jsonData = json.dumps(dataDecoded, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
             print jsonData
 
-            jsonDump(repr(data).decode("unicode-escape").encode('latin-1'), jsonConf['Filenames']['NewsJSON'])
+            jsonDump(dataDecoded, jsonConf['Filenames']['NewsJSON'])
 
         # Get the local links from this page and add them to the linksToFetch
         newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
