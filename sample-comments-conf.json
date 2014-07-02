@@ -1,0 +1,32 @@
+{
+    // Example comment 1
+    "BaseURL": "http://www.example.com",
+    "Filenames": { // Example comment 2
+        "LinksFetched": "LinksFetched.pickle",
+        "LinksToFetch": "LinksToFetch.pickle",
+        "NewsJSON":     "example-news.json"// Example comment 2 
+    },
+/*
+Example comment 3
+Example comment 3
+*/
+<!-- Comment 7 -->
+<!--  
+Comment 8 
+  -->
+    "NewsRegEx": { # Example 5
+        "NewsTitle":        "<div class=\"views-field-title\">\\s.*?<span class=\"field-content\"><h1>(.*?)</h1></span>\\s.*?</div>", #Example 6
+        "NewsAuthor":       "<div class=\"views-field-value\">\\s*<span class=\"field-content\"><a href=\".*?\">(.*?)</a></span>",# Example 4
+        "NewsDescription":  "<meta name=\"description\" content=\"(.*?)\" />",
+        "NewsKeywords":     "<meta name=\"keywords\" content=\"(.*?)\" />",
+        "NewsDateCreated":  "<div class=\"views-field-created\">\\s.*?<span class=\"field-content\">(.*?)</span>\\s.*?</div>",
+        "NewsDateUpdated":  "<div class=\"date\">\\s*?<p>\\s*?.*?: (.*?)</p>\\s*?</div>",
+        "NewsText":         "<div class=\"content clear-block\">\\s([.\\s\\S]*?)\\s.*?</div>"
+    },
+/* Example comment 3 */
+    "LinksRegEx": {
+        "LocalLinks":       "<a href=\"(.*?)\"",
+        "LinksExcluded":    ".*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?jpeg$|.*?png$",
+        "LinksIncluded":    ".*?/news/.*?|.*?/interview/.*?|.*?/content/.*?"
+    }
+}
