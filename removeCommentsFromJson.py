@@ -5,15 +5,6 @@ import os
 import io
 import sys
 import re
-import random   ##for pseudo-random generation
-import time     ##for time functions and sleep
-from datetime import datetime ##get time
-import urllib   ##url fetching
-import urlparse ##url parse
-import posixpath
-import sqlite3  ##sqlite
-import hashlib  ##hash md5 sha1...
-import pickle   ##pickle to serialize data
 import json     ##json to serialize data, web friendly?? and read json config file
 
 
