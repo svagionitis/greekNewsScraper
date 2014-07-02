@@ -21,7 +21,7 @@ def removeCommentsFromJson(filename):
     with open(filename) as jsonFileHandle:
         content = ''.join(jsonFileHandle.readlines())
         content = re.sub(r'//(?!www)[.\S ]*', '', content) # // comment, if there is a link http://www. exclude from comments
-        content = re.sub(r'#[.\w ]*', '', content) # # comment
+        content = re.sub(r'#[.\S ]*', '', content) # # comment
         content = re.sub(r'/\*[.\s\S]*?\*/', '', content) # /* .. */ comment
         content = re.sub(r'<!--[.\s\S]*?-->', '', content) # <!-- .. --> comment
 
