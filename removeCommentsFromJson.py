@@ -25,6 +25,9 @@ def removeCommentsFromJson(filename):
         content = re.sub(r'/\*[.\s\S]*?\*/', '', content) # /* .. */ comment
         content = re.sub(r'<!--[.\s\S]*?-->', '', content) # <!-- .. --> comment
 
+        # If there are 2 or more new lines replace with one
+        content = re.sub(r'[\n]{2,}', '\n', content)
+
         print content
 
         return json.loads(content)
