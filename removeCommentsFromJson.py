@@ -7,7 +7,6 @@ import sys
 import re
 import json     ##json to serialize data, web friendly?? and read json config file
 
-
 def removeCommentsFromJson(filename):
     with open(filename) as jsonFileHandle:
         content = ''.join(jsonFileHandle.readlines())
@@ -23,10 +22,17 @@ def removeCommentsFromJson(filename):
 
         return json.loads(content)
 
+def usage():
+    print("Usage: %s <json file>" % sys.argv[0])
+    sys.exit(0)
+
 # Gather our code in a main() function
 def main():
-    removeCommentsFromJson('sample-comments-conf.json')
 
+    if len(sys.argv) != 2:
+        usage()
+
+    removeCommentsFromJson(sys.argv[1])
 
 # Standard boilerplate to call the main() function to begin
 # the program.
