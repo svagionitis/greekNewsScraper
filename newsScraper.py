@@ -274,6 +274,7 @@ def main():
     # http://stackoverflow.com/questions/16625960/modifying-a-set-while-iterating-over-it
     while linksToFetch:
         link = linksToFetch.pop()
+        print 'Link poped...', link
         print 'Remaining links to be fetched ', len(linksToFetch)
 
         if link in linksFetched:
@@ -289,7 +290,6 @@ def main():
             continue
 
         # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
-        print 'Fetching...', link
         print 'Fetching...', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' - ', hashlib.sha1(link).hexdigest()
 
         htmlData = getUrl(link)
