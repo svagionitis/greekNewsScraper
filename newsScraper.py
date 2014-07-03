@@ -289,6 +289,7 @@ def main():
             continue
 
         # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
+        print 'Fetching...', link
         print 'Fetching...', urllib.unquote(link).encode('latin-1'), ' - ', hashlib.sha1(link).hexdigest()
 
         htmlData = getUrl(link)
