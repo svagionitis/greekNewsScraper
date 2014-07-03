@@ -62,7 +62,7 @@ def excludeLocalLinks(localLink):
     # Regex for excluded links
     excludeLink = re.compile(jsonConf['LinksRegEx']['LinksExcluded'])
     if excludeLink.match(localLink):
-        print 'Link ', urllib.unquote(localLink).encode('latin-1'), ' is excluded. It will not be fetched...'
+        print 'Link ', repr(urllib.unquote(localLink)).decode("unicode-escape").encode('latin-1'), ' is excluded. It will not be fetched...'
         return True
     else:
         return False
@@ -154,7 +154,7 @@ def createNewsData(htmlData, fullNewsURL):
     data = {}
     data['DateRetrieved'] = str(datetime.now())
 
-    data['NewsLink'] = urllib.unquote(fullNewsURL).encode('latin-1')
+    data['NewsLink'] = repr(urllib.unquote(fullNewsURL)).decode("unicode-escape").encode('latin-1')
     data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
 
     data['NewsTitle'] = getNewsTitle(htmlData)
@@ -245,7 +245,7 @@ def getUrl(url):
         if ufile.info().gettype() == 'text/html':
             return ufile.read()
     except IOError:
-        print 'Problem reading url:', urllib.unquote(url).encode('latin-1')
+        print 'Problem reading url:', repr(urllib.unquote(url)).decode("unicode-escape").encode('latin-1')
         sys.exit(1)
 
 
@@ -277,20 +277,20 @@ def main():
         print 'Remaining links to be fetched ', len(linksToFetch)
 
         if link in linksFetched:
-            print 'Link ', urllib.unquote(link).encode('latin-1'), ' already fetched...'
+            print 'Link ', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' already fetched...'
             continue
 
         if excludeLocalLinks(link):
             continue
 
         if urlparse.urlparse(link).netloc != 'www.iefimerida.gr':
-            print 'Link', urllib.unquote(link).encode('latin-1'), ' is not in this domain...'
+            print 'Link', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' is not in this domain...'
             linksFetched.add(link)
             continue
 
         # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
         print 'Fetching...', link
-        print 'Fetching...', urllib.unquote(link).encode('latin-1'), ' - ', hashlib.sha1(link).hexdigest()
+        print 'Fetching...', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' - ', hashlib.sha1(link).hexdigest()
 
         htmlData = getUrl(link)
 
