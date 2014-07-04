@@ -16,7 +16,7 @@
     },
     "LinksRegEx": {
         "LocalLinks":       "<a href=\"(.*?)\"",
-        "LinksExcluded":    ".*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?jpeg$|.*?png$",
+        "LinksExcluded":    ".*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?jpeg$|.*?png$|.*?gif$",
         "LinksIncluded":    ".*?/news/.*?|.*?/interview/.*?|.*?/content/.*?"
     }
 }
