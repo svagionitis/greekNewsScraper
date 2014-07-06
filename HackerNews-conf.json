@@ -16,26 +16,26 @@
         "About":        "<tr><td valign=top>about:</td><td>(.*?)</td></tr>"
     },
     "CommentsRegEx": {
-        "Id":                 "<span class=\"comhead\"><a href=\"user?id=.*?\">.*?</a>.*?<a href=\"item?id=(.*?)\">link</a>.*?<a href=.*?>parent</a></span>",
-        "UserCommented":        "<span class=\"comhead\"><a href=\"user?id=.*?\">(.*?)</a>.*?</span>",
-        "TimeCommented":        "<span class=\"comhead\"><a href=\"user?id=.*?\">.*?</a> (.*?)  \|.*?</span>",
-        "ParentId":             "<span class=\"comhead\"><a href=\"user?id=.*?\">.*?</a>.*?<a href=.*?>link</a>.*?<a href=\"item?id=(.*?)\">parent</a></span>",
-        "Comment":              "<span class=\"comment\"><font .*?>(.*?)</font></span>"
+        "Id":               "<span class=\"comhead\"><a href=\"user?id=.*?\">.*?</a>.*?<a href=\"item?id=(.*?)\">link</a>.*?<a href=.*?>parent</a></span>",
+        "UserCommented":    "<span class=\"comhead\"><a href=\"user?id=.*?\">(.*?)</a>.*?</span>",
+        "TimeCommented":    "<span class=\"comhead\"><a href=\"user?id=.*?\">.*?</a> (.*?)  \\|.*?</span>",
+        "ParentId":         "<span class=\"comhead\"><a href=\"user?id=.*?\">.*?</a>.*?<a href=.*?>link</a>.*?<a href=\"item?id=(.*?)\">parent</a></span>",
+        "Comment":          "<span class=\"comment\"><font .*?>(.*?)</font></span>"
     },
     "StoriesRegEx": {
-        "Number":             "<td align=right valign=top class=\"title\">(.*?)</td>",
-        "Id":                 "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=.*?\">.*?</a>.*?<a href=\"item?id=(.*?)\">.*?</a></td>"
-        "Title":                "<td class=\"title\"><a href=.*?>(.*?)</a>",
-        "Link":                 "<td class=\"title\"><a href=\"(.*?)\">.*?</a>",
-        "ShortLink":            "<span class=\"comhead\"> \((.*?)\) </span>",
-        "Score":                "<span id=score_.*?>(.*?)</span>",
-        "UserSubmitted":        "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=(.*?)\">.*?</a>.*?<a href=\"item?id=.*?\">.*?</a></td>",
-        "TimeSubmitted":        "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=.*?\">.*?</a> (.*?)  | <a href=\"item?id=.*?\">.*?</a></td>",
-        "NumberOfComments":     "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=.*?\">.*?</a>.*?<a href=\"item?id=.*?\">(.*?) comments</a></td>"
+        "Number":           "<td align=right valign=top class=\"title\">(.*?)</td>",
+        "Id":               "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=.*?\">.*?</a>.*?<a href=\"item?id=(.*?)\">.*?</a></td>",
+        "Title":            "<td class=\"title\"><a href=.*?>(.*?)</a>",
+        "Link":             "<td class=\"title\"><a href=\"(.*?)\">.*?</a>",
+        "ShortLink":        "<span class=\"comhead\"> \\((.*?)\\) </span>",
+        "Score":            "<span id=score_.*?>(.*?)</span>",
+        "UserSubmitted":    "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=(.*?)\">.*?</a>.*?<a href=\"item?id=.*?\">.*?</a></td>",
+        "TimeSubmitted":    "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=.*?\">.*?</a> (.*?)  | <a href=\"item?id=.*?\">.*?</a></td>",
+        "NumberOfComments": "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user?id=.*?\">.*?</a>.*?<a href=\"item?id=.*?\">(.*?) comments</a></td>"
     },
     "LinksRegEx": {
         "LocalLinks":       "<a href=\"(.*?)\"",
-        "LinksExcluded":    ".*?/x\?.*?|.*?/vote\?.*?|.*?.*?/reply\?.*?|.*?/submitted\?.*?|.*?/submitlink\?.*?|.*?/threads\?.*?",
-        "LinksIncluded":    ".*?item\?id=.*?|.*?user\?id=.*?"
+        "LinksExcluded":    ".*?/x\\?.*?|.*?/vote\\?.*?|.*?.*?/reply\\?.*?|.*?/submitted\\?.*?|.*?/submitlink\\?.*?|.*?/threads\\?.*?",
+        "LinksIncluded":    ".*?item\\?id=.*?|.*?user\\?id=.*?"
     }
 }
