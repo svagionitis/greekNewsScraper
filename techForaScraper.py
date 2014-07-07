@@ -28,7 +28,7 @@ class MyOpener(FancyURLopener):
 
 def readJsonConfFile(filename):
     global jsonConf
-    with open(filename)  as jsonFileHandle:
+    with open(filename) as jsonFileHandle:
         jsonConf = json.load(jsonFileHandle)
 
 def readFile(filename):
@@ -68,110 +68,98 @@ def excludeLocalLinks(localLink):
         return False
 
 
-def getNewsTitle(htmlData):
-    newsTitle = ''
-    newsTitleRegEx = re.compile(jsonConf['NewsRegEx']['NewsTitle'])
-    if newsTitleRegEx.search(htmlData):
-        newsTitle = newsTitleRegEx.search(htmlData).group(1)
-        newsTitle = replaceEntities(newsTitle)
+def getUserData(regEx, htmlData):
+    userData = ''
+    userDataRegEx = re.compile(regEx)
+    if userDataRegEx.search(htmlData):
+        userData = userDataRegEx.search(htmlData).group(1)
+        userData = replaceEntities(userData)
         # Remove any white spaces in the beginning
-        newsTitle = re.sub(r'^[\s]*', '', newsTitle)
+        userData = re.sub(r'^[\s]*', '', userData)
         # Remove any white spaces at the end
-        newsTitle = re.sub(r'[\s]*$', '', newsTitle)
+        userData = re.sub(r'[\s]*$', '', userData)
     else:
-        newsTitle = 'N/A'
-    return newsTitle
+        userData = 'N/A'
+    return userData
 
-def getNewsAuthor(htmlData):
-    newsAuthor = ''
-    newsAuthorRegEx = re.compile(jsonConf['NewsRegEx']['NewsAuthor'])
-    if newsAuthorRegEx.search(htmlData):
-        newsAuthor = newsAuthorRegEx.search(htmlData).group(1)
-    else:
-        newsAuthor = 'N/A'
-    return newsAuthor
 
-def getNewsDescription(htmlData):
-    newsDescription = ''
-    newsDescriptionRegEx = re.compile(jsonConf['NewsRegEx']['NewsDescription'])
-    # Check if group exists
-    if newsDescriptionRegEx.search(htmlData):
-        newsDescription = newsDescriptionRegEx.search(htmlData).group(1)
-        newsDescription = replaceEntities(newsDescription)
-    else:
-        newsDescription = 'N/A'
-    return newsDescription
-
-def getNewsKeywords(htmlData):
-    newsKeywords = []
-    newsKeywordsRegEx = re.compile(jsonConf['NewsRegEx']['NewsKeywords'])
-    if newsKeywordsRegEx.search(htmlData):
-        newsKeywords = newsKeywordsRegEx.search(htmlData).group(1)
-        newsKeywords = replaceEntities(newsKeywords)
-        # Split string in commas
-        newsKeywords = re.split(',+', str(newsKeywords))
-    else:
-        newsKeywords = 'N/A'
-    return newsKeywords
-
-def getNewsDateCreated(htmlData):
-    newsDateCreated = ''
-    newsDateCreatedRegEx = re.compile(jsonConf['NewsRegEx']['NewsDateCreated'])
-    if newsDateCreatedRegEx.search(htmlData):
-        newsDateCreated = newsDateCreatedRegEx.search(htmlData).group(1)
-    else:
-        newsDateCreated = 'N/A'
-    return newsDateCreated
-
-def getNewsDateUpdated(htmlData):
-    newsDateUpdated = ''
-    newsDateUpdatedRegEx = re.compile(jsonConf['NewsRegEx']['NewsDateUpdated'])
-    if newsDateUpdatedRegEx.search(htmlData):
-        newsDateUpdated = newsDateUpdatedRegEx.search(htmlData).group(1)
-    else:
-        newsDateUpdated = 'N/A'
-    return newsDateUpdated
-
-def getNewsText(htmlData):
-    newsText = ''
-    newsTextRegEx = re.compile(jsonConf['NewsRegEx']['NewsText'])
-    if newsTextRegEx.search(htmlData):
-        newsText = newsTextRegEx.search(htmlData).group(1)
-        newsText = replaceEntities(newsText)
-        # Remove the images attached
-        newsText = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsText)
-        # Remove all the html tags, need a clear text
-        newsText = re.sub(r'<[^>]*>', '', newsText)
-        # Remove any white spaces in the beginning
-        newsText = re.sub(r'^[\s]*', '', newsText)
-        # Remove any white spaces at the end
-        newsText = re.sub(r'[\s]*$', '', newsText)
-    else:
-        newsText = 'N/A'
-    return newsText
-
-def createNewsData(htmlData, fullNewsURL):
+def createUsersData(htmlData, url):
     data = {}
+    data['URL'] =           url
+    data['HashURL'] =       hashlib.sha1(url).hexdigest()
     data['DateRetrieved'] = str(datetime.now())
-
-    data['NewsLink'] = repr(urllib.unquote(fullNewsURL)).decode("unicode-escape").encode('latin-1')
-    data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
-
-    data['NewsTitle'] = getNewsTitle(htmlData)
-
-    data['NewsAuthor'] = getNewsAuthor(htmlData)
-
-    data['NewsDescription'] = getNewsDescription(htmlData)
-
-    data['NewsKeywords'] = getNewsKeywords(htmlData)
-
-    data['NewsDateCreated'] = getNewsDateCreated(htmlData)
-    data['NewsDateUpdated'] = getNewsDateUpdated(htmlData)
-
-    newsText = getNewsText(htmlData)
-    data['NewsText'] = newsText
-    data['HashNewsText'] = hashlib.sha1(newsText).hexdigest()
+    data['UserName'] =      getUserData(jsonConf['UsersRegEx']['UserName'], htmlData)
+    data['HashUserName'] =  hashlib.sha1(data['UserName']).hexdigest()
+    data['DateCreated'] =   getUserData(jsonConf['UsersRegEx']['DateCreated'], htmlData)
+    data['Karma'] =         getUserData(jsonConf['UsersRegEx']['Karma'], htmlData)
+    data['Avg'] =           getUserData(jsonConf['UsersRegEx']['Avg'], htmlData)
+    data['About'] =         getUserData(jsonConf['UsersRegEx']['About'], htmlData)
+    data['HashAbout'] =     hashlib.sha1(data['About']).hexdigest()
     return data
+
+def getStoriesData(regEx, htmlData):
+    storiesData = ''
+    storiesDataRegEx = re.compile(regEx)
+    if storiesDataRegEx.search(htmlData):
+        storiesData = storiesDataRegEx.search(htmlData).group(1)
+        storiesData = replaceEntities(storiesData)
+        # Remove any white spaces in the beginning
+        storiesData = re.sub(r'^[\s]*', '', storiesData)
+        # Remove any white spaces at the end
+        storiesData = re.sub(r'[\s]*$', '', storiesData)
+    else:
+        storiesData = 'N/A'
+    return storiesData
+
+def createStoriesData(htmlData, url):
+    data = {}
+    data['URL'] =               url
+    data['HashURL'] =           hashlib.sha1(url).hexdigest()
+    data['DateRetrieved'] =     str(datetime.now())
+    data['Number'] =            getStoriesData(jsonConf['StoriesRegEx']['Number'], htmlData)
+    data['Id'] =                getStoriesData(jsonConf['StoriesRegEx']['Id'], htmlData)
+    data['Title'] =             getStoriesData(jsonConf['StoriesRegEx']['Title'], htmlData)
+    data['HashTitle'] =         hashlib.sha1(data['Title']).hexdigest()
+    data['Link'] =              getStoriesData(jsonConf['StoriesRegEx']['Link'], htmlData)
+    data['HashLink'] =          hashlib.sha1(data['Link']).hexdigest()
+    data['ShortLink'] =         getStoriesData(jsonConf['StoriesRegEx']['ShortLink'], htmlData)
+    data['Score'] =             getStoriesData(jsonConf['StoriesRegEx']['Score'], htmlData)
+    data['UserSubmitted'] =     getStoriesData(jsonConf['StoriesRegEx']['UserSubmitted'], htmlData)
+    data['HashUserSubmitted'] = hashlib.sha1(data['UserSubmitted']).hexdigest()
+    data['TimeSubmitted'] =     getStoriesData(jsonConf['StoriesRegEx']['TimeSubmitted'], htmlData)
+    data['NumberOfComments'] =  getStoriesData(jsonConf['StoriesRegEx']['NumberOfComments'], htmlData)
+    return data
+
+def getCommentsData(regEx, htmlData):
+    commentsData = ''
+    commentsDataRegEx = re.compile(regEx)
+    if commentsDataRegEx.search(htmlData):
+        commentsData = commentsDataRegEx.search(htmlData).group(1)
+        commentsData = replaceEntities(commentsData)
+        # Remove all the html tags, need a clear text
+        commentsData = re.sub(r'<[^>]*>', '', commentsData)
+        # Remove any white spaces in the beginning
+        commentsData = re.sub(r'^[\s]*', '', commentsData)
+        # Remove any white spaces at the end
+        commentsData = re.sub(r'[\s]*$', '', commentsData)
+    else:
+        commentsData = 'N/A'
+    return commentsData
+
+def createCommentsData(htmlData, url):
+    data = {}
+    data['URL'] =               url
+    data['HashURL'] =           hashlib.sha1(url).hexdigest()
+    data['DateRetrieved'] =     str(datetime.now())
+    data['Id'] =                getCommentsData(jsonConf['CommentsRegEx']['Id'], htmlData)
+    data['UserCommented'] =     getCommentsData(jsonConf['CommentsRegEx']['UserCommented'], htmlData)
+    data['HashUserCommented'] = hashlib.sha1(data['UserCommented']).hexdigest()
+    data['TimeCommented'] =     getCommentsData(jsonConf['CommentsRegEx']['TimeCommented'], htmlData)
+    data['ParentId'] =          getCommentsData(jsonConf['CommentsRegEx']['ParentId'], htmlData)
+    data['Comment'] =           getCommentsData(jsonConf['CommentsRegEx']['Comment'], htmlData)
+    data['HashComment'] =       hashlib.sha1(data['Comment']).hexdigest()
+    return data
+
 
 def jsonDump(data, jsonFilename):
     with open(jsonFilename, 'a+') as jsonFileHandle:
@@ -279,6 +267,7 @@ def main():
 
     print 'Initial unique links to be retrieved ', len(linksToFetch)
 
+
     # http://stackoverflow.com/questions/16625960/modifying-a-set-while-iterating-over-it
     while linksToFetch:
         link = linksToFetch.pop()
@@ -304,8 +293,8 @@ def main():
         htmlData = getUrl(link)
 
         # Check if it's in included links
-        isNewsLink = re.compile(jsonConf['LinksRegEx']['LinksIncluded'])
-        if isNewsLink.match(link):
+        isIncludedLink = re.compile(jsonConf['LinksRegEx']['LinksIncluded'])
+        if isIncludedLink.match(link):
             # Check here if it's a story, comment or user link
 
             # writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
@@ -313,14 +302,26 @@ def main():
             # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
             # print repr(createNewsData(htmlData, fetchNewsLink)).decode("unicode-escape").encode('latin-1')
 
-            usersData = createUsersData(htmlData, link)
-            storiesData = createStoriesData(htmlData, link)
-            commentsData = createCommentsData(htmlData, link)
-
-            jsonData = json.dumps(data, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
-            print jsonData
-
-            jsonDump(data, jsonConf['Filenames']['NewsJSON'])
+            # JSON users
+            if re.match(jsonConf['LinksRegEx']['LinksUser'], link):
+                usersData = createUsersData(htmlData, link)
+                jsonUsersData = json.dumps(usersData, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
+                print jsonUsersData
+                jsonDump(usersData, jsonConf['Filenames']['UsersJSON'])
+            else:
+                # JSON stories
+                # If there is a parent id it's a comment. If not it's a story
+                if getCommentsData(jsonConf['CommentsRegEx']['ParentId'], htmlData) == 'N/A':
+                    storiesData = createStoriesData(htmlData, link)
+                    jsonStoriesData = json.dumps(storiesData, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
+                    print jsonStoriesData
+                    jsonDump(storiesData, jsonConf['Filenames']['StoriesJSON'])
+                else:
+                    # JSON comments
+                    commentsData = createCommentsData(htmlData, link)
+                    jsonCommentsData = json.dumps(commentsData, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
+                    print jsonCommentsData
+                    jsonDump(commentsData, jsonConf['Filenames']['CommentsJSON'])
 
         # Get the local links from this page and add them to the linksToFetch
         newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
