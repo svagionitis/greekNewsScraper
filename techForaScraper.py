@@ -95,7 +95,7 @@ def createUsersData(htmlData, url):
     data['Avg'] =           getUserData(jsonConf['UsersRegEx']['Avg'], htmlData)
     data['About'] =         getUserData(jsonConf['UsersRegEx']['About'], htmlData)
     data['HashAbout'] =     hashlib.sha1(data['About']).hexdigest()
-    return data
+    return repr(data).decode("unicode-escape").encode('latin-1')
 
 def getStoriesData(regEx, htmlData):
     storiesData = ''
@@ -128,7 +128,7 @@ def createStoriesData(htmlData, url):
     data['HashUserSubmitted'] = hashlib.sha1(data['UserSubmitted']).hexdigest()
     data['TimeSubmitted'] =     getStoriesData(jsonConf['StoriesRegEx']['TimeSubmitted'], htmlData)
     data['NumberOfComments'] =  getStoriesData(jsonConf['StoriesRegEx']['NumberOfComments'], htmlData)
-    return data
+    return repr(data).decode("unicode-escape").encode('latin-1')
 
 def getCommentsData(regEx, htmlData):
     commentsData = ''
@@ -158,7 +158,7 @@ def createCommentsData(htmlData, url):
     data['ParentId'] =          getCommentsData(jsonConf['CommentsRegEx']['ParentId'], htmlData)
     data['Comment'] =           getCommentsData(jsonConf['CommentsRegEx']['Comment'], htmlData)
     data['HashComment'] =       hashlib.sha1(data['Comment']).hexdigest()
-    return data
+    return repr(data).decode("unicode-escape").encode('latin-1')
 
 
 def jsonDump(data, jsonFilename):
@@ -218,9 +218,12 @@ def createAbsoluteURL(home, url):
 def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
     localLinks = []
     regExprString = jsonConf['LinksRegEx']['LocalLinks']
-    localLinks = re.findall(regExprString, htmlPage)
-    # Create the full link
-    fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
+    if htmlPage: # If not empty
+        localLinks = re.findall(regExprString, htmlPage)
+        # Create the full link
+        fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
+    else: # If empty
+        fullLinks = localLinks
     return set(fullLinks - (fetchedLinks | toBeFetchedLinks))
 
 ## Version that uses try/except to print an error message if the
@@ -305,6 +308,7 @@ def main():
             # JSON users
             if re.match(jsonConf['LinksRegEx']['LinksUser'], link):
                 usersData = createUsersData(htmlData, link)
+                print usersData
                 jsonUsersData = json.dumps(usersData, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
                 print jsonUsersData
                 jsonDump(usersData, jsonConf['Filenames']['UsersJSON'])
@@ -313,12 +317,14 @@ def main():
                 # If there is a parent id it's a comment. If not it's a story
                 if getCommentsData(jsonConf['CommentsRegEx']['ParentId'], htmlData) == 'N/A':
                     storiesData = createStoriesData(htmlData, link)
+                    print storiesData
                     jsonStoriesData = json.dumps(storiesData, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
                     print jsonStoriesData
                     jsonDump(storiesData, jsonConf['Filenames']['StoriesJSON'])
                 else:
                     # JSON comments
                     commentsData = createCommentsData(htmlData, link)
+                    print commentsData
                     jsonCommentsData = json.dumps(commentsData, ensure_ascii = False, sort_keys = True, indent = 4, separators = (',', ': '))
                     print jsonCommentsData
                     jsonDump(commentsData, jsonConf['Filenames']['CommentsJSON'])
