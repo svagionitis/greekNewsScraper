@@ -1,8 +1,8 @@
 {
     "BaseURL": "http://www.iefimerida.gr",
     "Filenames": {
-        "LinksFetched": "LinksFetched.pickle",
-        "LinksToFetch": "LinksToFetch.pickle",
+        "LinksFetched": "iefimerida-LinksFetched.pickle",
+        "LinksToFetch": "iefimerida-LinksToFetch.pickle",
         "NewsJSON":     "iefimerida-news.json"
     },
     "NewsRegEx": {
