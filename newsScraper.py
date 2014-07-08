@@ -317,7 +317,7 @@ def main():
         linksFetched.add(link)
         print 'Total links fetched so far ', len(linksFetched)
 
-        nextLinkDelay(11, 21)
+        nextLinkDelay(11, 16)
 
         dumpLinksToFetch(linksToFetch)
         dumpLinksFetched(linksFetched)
