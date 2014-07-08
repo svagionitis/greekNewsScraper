@@ -19,5 +19,6 @@
         "LocalLinks":       "<a href=\"(.*?)\"",
         "LinksExcluded":    ".*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?jpeg$|.*?png$|.*?gif$",
         "LinksIncluded":    ".*?/news/.*?|.*?/interview/.*?|.*?/content/.*?"
-    }
+    },
+    "DelayRange": [ 11, 16]
 }

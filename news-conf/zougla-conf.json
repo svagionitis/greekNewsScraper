@@ -19,5 +19,6 @@
         "LocalLinks":       "<a href=\"(.*?)\"",
         "LinksExcluded":    ".*?file.ashx.*?|.*?javascript.*?|.*?mailto:.*?|.*?xml.*?",
         "LinksIncluded":    ".*?/article/.*?"
-    }
+    },
+    "DelayRange": [ 20, 26]
 }

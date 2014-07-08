@@ -324,7 +324,7 @@ def main():
         linksFetched.add(link)
         print 'Total links fetched so far ', len(linksFetched)
 
-        nextLinkDelay(11, 16)
+        nextLinkDelay(jsonConf['DelayRange'][0], jsonConf['DelayRange'][1])
 
         dumpLinksToFetch(linksToFetch)
         dumpLinksFetched(linksFetched)
