@@ -24,7 +24,7 @@ jsonConf = {}
 
 # Use google bot as user agent
 class MyOpener(FancyURLopener):
-    version = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    version = 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1b4) Gecko/20090427 Fedora/3.5-0.20.beta4.fc11 Firefox/3.5b4'
 
 def readJsonConfFile(filename):
     global jsonConf
