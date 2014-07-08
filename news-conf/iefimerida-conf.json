@@ -1,5 +1,6 @@
 {
     "BaseURL": "http://www.iefimerida.gr",
+    "NetworkLocation": "www.iefimerida.gr",
     "Filenames": {
         "LinksFetched": "iefimerida-LinksFetched.pickle",
         "LinksToFetch": "iefimerida-LinksToFetch.pickle",

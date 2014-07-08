@@ -291,7 +291,7 @@ def main():
         if excludeLocalLinks(link):
             continue
 
-        if urlparse.urlparse(link).netloc != 'www.iefimerida.gr':
+        if urlparse.urlparse(link).netloc != jsonConf['NetworkLocation']:
             print 'Link', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' is not in this domain...'
             linksFetched.add(link)
             continue
