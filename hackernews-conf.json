@@ -1,0 +1,42 @@
+{
+    "BaseURL": "https://news.ycombinator.com/",
+    "NetworkLocation": "news.ycombinator.com",
+    "Filenames": {
+        "LinksFetched": "HackerNews-LinksFetched.pickle",
+        "LinksToFetch": "HackerNews-LinksToFetch.pickle",
+        "UsersJSON":    "HackerNews-Users.json",
+        "StoriesJSON":  "HackerNews-Stories.json",
+        "CommentsJSON": "HackerNews-Comments.json"
+    },
+    "UsersRegEx": {
+        "UserName":     "<tr><td valign=top>user:</td><td>(.*?)</td></tr>",
+        "DateCreated":  "<tr><td valign=top>created:</td><td>(.*?)</td></tr>",
+        "Karma":        "<tr><td valign=top>karma:</td><td>(.*?)</td></tr>",
+        "Avg":          "<tr><td valign=top>avg:</td><td>(.*?)</td></tr>",
+        "About":        "<tr><td valign=top>about:</td><td>(.*?)</td></tr>"
+    },
+    "CommentsRegEx": {
+        "Id":               "<span class=\"comhead\"><a href=\"user\\?id=.*?\">.*?</a>.*?<a href=\"item\\?id=(.*?)\">link</a>.*?<a href=.*?>parent</a></span>",
+        "UserCommented":    "<span class=\"comhead\"><a href=\"user\\?id=.*?\">(.*?)</a>.*?</span>",
+        "TimeCommented":    "<span class=\"comhead\"><a href=\"user\\?id=.*?\">.*?</a> (.*?)  \\|.*?</span>",
+        "ParentId":         "<span class=\"comhead\"><a href=\"user\\?id=.*?\">.*?</a>.*?<a href=.*?>link</a>.*?<a href=\"item\\?id=(.*?)\">parent</a></span>",
+        "Comment":          "<span class=\"comment\"><font .*?>(.*?)</font></span>"
+    },
+    "StoriesRegEx": {
+        "Number":           "<td align=right valign=top class=\"title\">(.*?)</td>",
+        "Id":               "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user\\?id=.*?\">.*?</a>.*?<a href=\"item\\?id=(.*?)\">.*?</a></td>",
+        "Title":            "<td class=\"title\"><a href=.*?>(.*?)</a>",
+        "Link":             "<td class=\"title\"><a href=\"(.*?)\">.*?</a>",
+        "ShortLink":        "<span class=\"comhead\"> \\((.*?)\\) </span>",
+        "Score":            "<span id=score_.*?>(.*?)</span>",
+        "UserSubmitted":    "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user\\?id=(.*?)\">.*?</a>.*?<a href=\"item\\?id=.*?\">.*?</a></td>",
+        "TimeSubmitted":    "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user\\?id=.*?\">.*?</a> (.*?)  | <a href=\"item\\?id=.*?\">.*?</a></td>",
+        "NumberOfComments": "<td class=\"subtext\"><span id=score_.*?>.*?</span>.*?<a href=\"user\\?id=.*?\">.*?</a>.*?<a href=\"item\\?id=.*?\">(.*?) comments</a></td>"
+    },
+    "LinksRegEx": {
+        "LocalLinks":       "<a href=\"(.*?)\"",
+        "LinksExcluded":    ".*?/x\\?.*?|.*?/vote\\?.*?|.*?.*?/reply\\?.*?|.*?/submitted\\?.*?|.*?/submitlink\\?.*?|.*?/threads\\?.*?|.*?newslogin\\?whence=.*?|.*?rss$",
+        "LinksIncluded":    ".*?item\\?id=.*?|.*?user\\?id=.*?",
+        "LinksUser":        ".*?user\\?id=.*?"
+    }
+}
