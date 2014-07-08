@@ -35,7 +35,7 @@
     },
     "LinksRegEx": {
         "LocalLinks":       "<a href=\"(.*?)\"",
-        "LinksExcluded":    ".*?/x\\?.*?|.*?/vote\\?.*?|.*?.*?/reply\\?.*?|.*?/submitted\\?.*?|.*?/submitlink\\?.*?|.*?/threads\\?.*?|.*?rss$",
+        "LinksExcluded":    ".*?/x\\?.*?|.*?/vote\\?.*?|.*?.*?/reply\\?.*?|.*?/submitted\\?.*?|.*?/submitlink\\?.*?|.*?/threads\\?.*?|.*?newslogin\\?whence=.*?|.*?rss$",
         "LinksIncluded":    ".*?item\\?id=.*?|.*?user\\?id=.*?",
         "LinksUser":        ".*?user\\?id=.*?"
     }
