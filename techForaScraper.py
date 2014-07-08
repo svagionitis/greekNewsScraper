@@ -222,9 +222,9 @@ def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
         localLinks = re.findall(regExprString, htmlPage)
         # Create the full link
         fullLinks = set([ createAbsoluteURL(baseURL, s) for s in localLinks ])
+        return set(fullLinks - (fetchedLinks | toBeFetchedLinks))
     else: # If empty
-        fullLinks = localLinks
-    return set(fullLinks - (fetchedLinks | toBeFetchedLinks))
+        return set(localLinks)
 
 ## Version that uses try/except to print an error message if the
 ## urlopen() fails.
