@@ -248,11 +248,18 @@ def getUrl(url):
         print 'Problem reading url:', repr(urllib.unquote(url)).decode("unicode-escape").encode('latin-1')
         sys.exit(1)
 
+def usage():
+    print("Usage: %s <json conf file>" % sys.argv[0])
+    sys.exit(0)
 
 # Gather our code in a main() function
 def main():
+
+    if len(sys.argv) != 2:
+        usage()
+
     # Read json conf files
-    readJsonConfFile('iefimerida/iefimerida.json')
+    readJsonConfFile(sys.argv[1])
 
     baseURL = jsonConf['BaseURL']
 
