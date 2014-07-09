@@ -285,7 +285,7 @@ def main():
             continue
 
         # Check if it's in the same domain.
-        if urlparse.urlparse(link).netloc != jsonConf['NetworkLocation']:
+        if jsonConf['NetworkLocation'] not in urlparse.urlparse(link).netloc:
             print 'Link', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' is not in this domain...'
             linksFetched.add(link)
             continue
@@ -338,7 +338,7 @@ def main():
         linksFetched.add(link)
         print 'Total links fetched so far ', len(linksFetched)
 
-        nextLinkDelay(31, 37)
+        nextLinkDelay(jsonConf['DelayRange'][0], jsonConf['DelayRange'][1])
 
         dumpLinksToFetch(linksToFetch)
         dumpLinksFetched(linksFetched)
