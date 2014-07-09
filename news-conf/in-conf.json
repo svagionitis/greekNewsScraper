@@ -1,0 +1,24 @@
+{
+    "BaseURL": "http://www.in.gr/",
+    "NetworkLocation": "www.in.gr",
+    "Filenames": {
+        "LinksFetched": "in-LinksFetched.pickle",
+        "LinksToFetch": "in-LinksToFetch.pickle",
+        "NewsJSON":     "in-news.json"
+    },
+    "NewsRegEx": {
+        "NewsTitle":        "<h1 class=\"article_title\">\\s*?(.*?)</h1>",
+        "NewsAuthor":       "<div class=\"author\">\\s*(.*?)\\s*?</div>",
+        "NewsDescription":  "<meta name=\"description\" content=\"(.*?)\" />",
+        "NewsKeywords":     "<meta name=\"keywords\" content=\"(.*?)\" />",
+        "NewsDateCreated":  "<div class=\"top_date\">\\s*?.*?: (.*?)\\s*?</div>",
+        "NewsDateUpdated":  "<div class=\"date\">\\s*?<p>\\s*?.*?: (.*?)</p>\\s*?</div>",
+        "NewsText":         "<div class=\"description\">\\s([.\\s\\S]*?)\\s.*?</div>"
+    },
+    "LinksRegEx": {
+        "LocalLinks":       "<a href=\"(.*?)\"",
+        "LinksExcluded":    ".*?/netvolution/.*?|.*?/Themes/.*?|.*?/Temp/.*?|.*?/z_.*?|.*?/polls-archive/.*?/\\?plid=.*?",
+        "LinksIncluded":    ".*?/article/\\?aid=.*?"
+    },
+    "DelayRange": [ 21, 26]
+}
