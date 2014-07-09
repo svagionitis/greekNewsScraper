@@ -38,5 +38,6 @@
         "LinksExcluded":    ".*?/x\\?.*?|.*?/vote\\?.*?|.*?.*?/reply\\?.*?|.*?/submitted\\?.*?|.*?/submitlink\\?.*?|.*?/threads\\?.*?|.*?newslogin\\?whence=.*?|.*?rss$",
         "LinksIncluded":    ".*?item\\?id=.*?|.*?user\\?id=.*?",
         "LinksUser":        ".*?user\\?id=.*?"
-    }
+    },
+    "DelayRange": [ 41, 51]
 }
