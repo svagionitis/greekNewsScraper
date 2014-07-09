@@ -1,6 +1,6 @@
 {
     "BaseURL": "http://www.zougla.gr",
-    "NetworkLocation": "www.zougla.gr",
+    "NetworkLocation": "zougla.gr",
     "Filenames": {
         "LinksFetched": "zougla-LinksFetched.pickle",
         "LinksToFetch": "zougla-LinksToFetch.pickle",
