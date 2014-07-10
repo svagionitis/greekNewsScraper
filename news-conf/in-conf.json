@@ -7,18 +7,19 @@
         "NewsJSON":     "in-news.json"
     },
     "NewsRegEx": {
-        "NewsTitle":        "<h1 class=\"article_title\">\\s*?(.*?)</h1>",
-        "NewsAuthor":       "<div class=\"author\">\\s*(.*?)\\s*?</div>",
-        "NewsDescription":  "<meta name=\"description\" content=\"(.*?)\" />",
-        "NewsKeywords":     "<meta name=\"keywords\" content=\"(.*?)\" />",
-        "NewsDateCreated":  "<div class=\"top_date\">\\s*?.*?: (.*?)\\s*?</div>",
-        "NewsDateUpdated":  "<div class=\"date\">\\s*?<p>\\s*?.*?: (.*?)</p>\\s*?</div>",
-        "NewsText":         "<div class=\"description\">\\s([.\\s\\S]*?)\\s.*?</div>"
+        "NewsTitle":        "<h1>(.*?)</h1>\\s*?<div id=\".*?-article\">",
+        "NewsAuthor":       "<meta name=\"AUTHOR\" content=\"(.*?)\">",
+        "NewsDescription":  "<meta name=\"DESCRIPTION\" content=\"([.\\s\\S]*?)\" />",
+        "NewsKeywords":     "<meta name=\"KEYWORDS\" content=\"(.*?)\" />",
+        "NewsDateCreated":  "<p class=\"article-date-info ArticleId_.*?\">\\s*?.*?<ins datetime=\".*?\"><em>\\s*?.*?:(.*?)</em></ins>",
+        "NewsDateUpdated":  "<ins datetime=\".*?\"><em>\\s*?.*?:(.*?)</em></ins>\\s*?</p>",
+        "NewsText":         "<!--intext_content_tag_start--><div id=\"intext_content_tag\">([.\\s\\S]*?)</div><!-- intext_content_tag_end-->",
+        "NewsCredits":      "<p class=\"credits\">(.*?)</p>"
     },
     "LinksRegEx": {
         "LocalLinks":       "<a href=\"(.*?)\"",
         "LinksExcluded":    ".*?/netvolution/.*?|.*?/Themes/.*?|.*?/Temp/.*?|.*?/z_.*?|.*?/polls-archive/.*?/\\?plid=.*?",
-        "LinksIncluded":    ".*?/article/\\?aid=.*?"
+        "LinksIncluded":    ".*?/article\\?aid=.*?|.*?/post\\?aid=.*?"
     },
     "DelayRange": [ 21, 26]
 }
