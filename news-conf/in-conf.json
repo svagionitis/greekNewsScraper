@@ -7,7 +7,7 @@
         "NewsJSON":     "in-news.json"
     },
     "NewsRegEx": {
-        "NewsTitle":        "<h1>(.*?)</h1>\\s*?<div id=\".*?-article\">",
+        "NewsTitle":        "<h1>(.*?)</h1>[.\\s\\S]*?<div id=\".*?-article\">",
         "NewsAuthor":       "<meta name=\"AUTHOR\" content=\"(.*?)\">",
         "NewsDescription":  "<meta name=\"DESCRIPTION\" content=\"([.\\s\\S]*?)\" />",
         "NewsKeywords":     "<meta name=\"KEYWORDS\" content=\"(.*?)\" />",
@@ -18,8 +18,8 @@
     },
     "LinksRegEx": {
         "LocalLinks":       "<a href=\"(.*?)\"",
-        "LinksExcluded":    ".*?/netvolution/.*?|.*?/Themes/.*?|.*?/Temp/.*?|.*?/z_.*?|.*?/polls-archive/.*?/\\?plid=.*?",
+        "LinksExcluded":    ".*?/netvolution/.*?|.*?/Themes/.*?|.*?/Temp/.*?|.*?/z_.*?|.*?/polls-archive/.*?/\\?plid=.*?|.*?rss\\..*?|.*?expressads.*?",
         "LinksIncluded":    ".*?/article\\?aid=.*?|.*?/post\\?aid=.*?"
     },
-    "DelayRange": [ 21, 26]
+    "DelayRange": [ 11, 16]
 }
