@@ -301,6 +301,12 @@ def main():
 
         htmlData = getUrl(link)
 
+        # Check if empty
+        if not htmlData:
+            print 'Link ', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' appears empty...'
+            print 'The content is @@', htmlData, '@@'
+            continue
+
         # Check if it's a news link
         isNewsLink = re.compile(jsonConf['LinksRegEx']['LinksIncluded'])
         if isNewsLink.match(link):
