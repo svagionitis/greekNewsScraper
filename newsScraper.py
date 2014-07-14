@@ -123,25 +123,15 @@ def nextLinkDelay(startDelay, endDelay):
     time.sleep(randomNum)
 
 
-def dumpLinksToFetch(LinksToFetch):
-    with open(jsonConf['Filenames']['LinksToFetch'], 'wb') as pickleFileHandle:
+def dumpPickle(LinksToFetch, filename):
+    with open(filename, 'wb') as pickleFileHandle:
         pickle.dump(LinksToFetch, pickleFileHandle)
 
-def dumpLinksFetched(LinksFetched):
-    with open(jsonConf['Filenames']['LinksFetched'], 'wb') as pickleFileHandle:
-        pickle.dump(LinksFetched, pickleFileHandle)
-
-def restoreLinksToFetch():
-    restoredLinksToFetch = set([])
-    with open(jsonConf['Filenames']['LinksToFetch'], 'rb') as fileHandle:
-        restoredLinksToFetch = pickle.load(fileHandle)
-    return restoredLinksToFetch
-
-def restoreLinksFetched():
-    restoredLinksFetched = set([])
-    with open(jsonConf['Filenames']['LinksFetched'], 'rb') as fileHandle:
-        restoredLinksFetched = pickle.load(fileHandle)
-    return restoredLinksFetched
+def restorePickle(filename):
+    restoredPickle = set([])
+    with open(filename, 'rb') as fileHandle:
+        restoredPickle = pickle.load(fileHandle)
+    return restoredPickle
 
 def writeHTMLToFile(htmlData, filename):
     # Check if directory exists, if not create it
@@ -208,8 +198,8 @@ def main():
     # Retrieve the links from the base url if the pickle files are not present
     if os.path.isfile(jsonConf['Filenames']['LinksFetched']) and os.path.isfile(jsonConf['Filenames']['LinksToFetch']):
         print jsonConf['Filenames']['LinksFetched'], 'and',  jsonConf['Filenames']['LinksToFetch'], 'are present. Restoring...'
-        linksToFetch = restoreLinksToFetch()
-        linksFetched = restoreLinksFetched()
+        linksToFetch = restorePickle(jsonConf['Filenames']['LinksToFetch'])
+        linksFetched = restorePickle(jsonConf['Filenames']['LinksFetched'])
     else:
         baseHtmlData = getUrl(baseURL)
         linksToFetch = getLocalLinks(baseHtmlData, baseURL, linksFetched, linksToFetch)
@@ -271,8 +261,8 @@ def main():
 
         nextLinkDelay(jsonConf['DelayRange'][0], jsonConf['DelayRange'][1])
 
-        dumpLinksToFetch(linksToFetch)
-        dumpLinksFetched(linksFetched)
+        dumpPickle(linksToFetch, jsonConf['Filenames']['LinksToFetch'])
+        dumpPickle(linksFetched, jsonConf['Filenames']['LinksFetched'])
 
 # Standard boilerplate to call the main() function to begin
 # the program.
