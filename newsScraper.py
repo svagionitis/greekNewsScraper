@@ -68,7 +68,7 @@ def excludeLocalLinks(localLink):
         return False
 
 def getNewsData(htmlData, regexString):
-    newsData = ''
+    newsData = None
     newsDataRegEx = re.compile(regexString)
     if newsDataRegEx.search(htmlData):
         newsData = newsDataRegEx.search(htmlData).group(1)
@@ -81,91 +81,13 @@ def getNewsData(htmlData, regexString):
         newsData = re.sub(r'^[\s]*', '', newsData)
         # Remove any white spaces at the end
         newsData = re.sub(r'[\s]*$', '', newsData)
+        if regexString == jsonConf['NewsRegEx']['NewsKeywords']:
+            # Split string in commas
+            newsData = re.split(',+', str(newsData))
+
     else:
         newsData = 'N/A'
     return newsData
-
-def getNewsTitle(htmlData):
-    newsTitle = ''
-    newsTitleRegEx = re.compile(jsonConf['NewsRegEx']['NewsTitle'])
-    if newsTitleRegEx.search(htmlData):
-        newsTitle = newsTitleRegEx.search(htmlData).group(1)
-        newsTitle = replaceEntities(newsTitle)
-        # Remove any white spaces in the beginning
-        newsTitle = re.sub(r'^[\s]*', '', newsTitle)
-        # Remove any white spaces at the end
-        newsTitle = re.sub(r'[\s]*$', '', newsTitle)
-    else:
-        newsTitle = 'N/A'
-    return newsTitle
-
-def getNewsAuthor(htmlData):
-    newsAuthor = ''
-    newsAuthorRegEx = re.compile(jsonConf['NewsRegEx']['NewsAuthor'])
-    if newsAuthorRegEx.search(htmlData):
-        newsAuthor = newsAuthorRegEx.search(htmlData).group(1)
-    else:
-        newsAuthor = 'N/A'
-    return newsAuthor
-
-def getNewsDescription(htmlData):
-    newsDescription = ''
-    newsDescriptionRegEx = re.compile(jsonConf['NewsRegEx']['NewsDescription'])
-    # Check if group exists
-    if newsDescriptionRegEx.search(htmlData):
-        newsDescription = newsDescriptionRegEx.search(htmlData).group(1)
-        newsDescription = replaceEntities(newsDescription)
-    else:
-        newsDescription = 'N/A'
-    return newsDescription
-
-def getNewsKeywords(htmlData):
-    newsKeywords = []
-    newsKeywordsRegEx = re.compile(jsonConf['NewsRegEx']['NewsKeywords'])
-    if newsKeywordsRegEx.search(htmlData):
-        newsKeywords = newsKeywordsRegEx.search(htmlData).group(1)
-        newsKeywords = replaceEntities(newsKeywords)
-        # Split string in commas
-        newsKeywords = re.split(',+', str(newsKeywords))
-    else:
-        newsKeywords = 'N/A'
-    return newsKeywords
-
-def getNewsDateCreated(htmlData):
-    newsDateCreated = ''
-    newsDateCreatedRegEx = re.compile(jsonConf['NewsRegEx']['NewsDateCreated'])
-    if newsDateCreatedRegEx.search(htmlData):
-        newsDateCreated = newsDateCreatedRegEx.search(htmlData).group(1)
-    else:
-        newsDateCreated = 'N/A'
-    return newsDateCreated
-
-def getNewsDateUpdated(htmlData):
-    newsDateUpdated = ''
-    newsDateUpdatedRegEx = re.compile(jsonConf['NewsRegEx']['NewsDateUpdated'])
-    if newsDateUpdatedRegEx.search(htmlData):
-        newsDateUpdated = newsDateUpdatedRegEx.search(htmlData).group(1)
-    else:
-        newsDateUpdated = 'N/A'
-    return newsDateUpdated
-
-def getNewsText(htmlData):
-    newsText = ''
-    newsTextRegEx = re.compile(jsonConf['NewsRegEx']['NewsText'])
-    if newsTextRegEx.search(htmlData):
-        newsText = newsTextRegEx.search(htmlData).group(1)
-        newsText = replaceEntities(newsText)
-        # Remove the images attached
-        newsText = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsText)
-        # Remove all the html tags, need a clear text
-        newsText = re.sub(r'<[^>]*>', '', newsText)
-        # Remove any white spaces in the beginning
-        newsText = re.sub(r'^[\s]*', '', newsText)
-        # Remove any white spaces at the end
-        newsText = re.sub(r'[\s]*$', '', newsText)
-    else:
-        newsText = 'N/A'
-    return newsText
 
 def createNewsData(htmlData, fullNewsURL):
     data = {}
@@ -174,18 +96,18 @@ def createNewsData(htmlData, fullNewsURL):
     data['NewsLink'] = repr(urllib.unquote(fullNewsURL)).decode("unicode-escape").encode('latin-1')
     data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
 
-    data['NewsTitle'] = getNewsTitle(htmlData)
+    data['NewsTitle'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsTitle'])
 
-    data['NewsAuthor'] = getNewsAuthor(htmlData)
+    data['NewsAuthor'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsAuthor'])
 
-    data['NewsDescription'] = getNewsDescription(htmlData)
+    data['NewsDescription'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsDescription'])
 
-    data['NewsKeywords'] = getNewsKeywords(htmlData)
+    data['NewsKeywords'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsKeywords'])
 
-    data['NewsDateCreated'] = getNewsDateCreated(htmlData)
-    data['NewsDateUpdated'] = getNewsDateUpdated(htmlData)
+    data['NewsDateCreated'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsDateCreated'])
+    data['NewsDateUpdated'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsDateUpdated'])
 
-    newsText = getNewsText(htmlData)
+    newsText = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsText'])
     data['NewsText'] = newsText
     data['HashNewsText'] = hashlib.sha1(newsText).hexdigest()
     return data
