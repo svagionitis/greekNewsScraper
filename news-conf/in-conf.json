@@ -1,6 +1,6 @@
 {
     "BaseURL": "http://www.in.gr/",
-    "NetworkLocation": "in.gr",
+    "NetworkLocation": ".in.gr",
     "Filenames": {
         "LinksFetched": "in-LinksFetched.pickle",
         "LinksToFetch": "in-LinksToFetch.pickle",
