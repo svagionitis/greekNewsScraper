@@ -67,6 +67,23 @@ def excludeLocalLinks(localLink):
     else:
         return False
 
+def getNewsData(htmlData, regexString):
+    newsData = ''
+    newsDataRegEx = re.compile(regexString)
+    if newsDataRegEx.search(htmlData):
+        newsData = newsDataRegEx.search(htmlData).group(1)
+        newsData = replaceEntities(newsData)
+        # Remove the images attached
+        newsData = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsData)
+        # Remove all the html tags, need a clear text
+        newsData = re.sub(r'<[^>]*>', '', newsData)
+        # Remove any white spaces in the beginning
+        newsData = re.sub(r'^[\s]*', '', newsData)
+        # Remove any white spaces at the end
+        newsData = re.sub(r'[\s]*$', '', newsData)
+    else:
+        newsData = 'N/A'
+    return newsData
 
 def getNewsTitle(htmlData):
     newsTitle = ''
