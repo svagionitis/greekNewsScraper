@@ -147,6 +147,9 @@ def writeHTMLToFile(htmlData, filename):
         sys.exit(1)
 
 def createAbsoluteURL(home, url):
+    home = unicode(home, 'utf-8', errors='ignore')
+    url = unicode(url, 'utf-8', errors='ignore')
+
     print 'Processing home: ', home, 'url: ', url
     join = urlparse.urljoin(home, url)
     parse = urlparse.urlparse(join)
@@ -154,6 +157,7 @@ def createAbsoluteURL(home, url):
 
     absolute = urlparse.urlunparse((parse.scheme, parse.netloc, path, parse.params, parse.query, None))
 
+    print 'Absolute: ', absolute
     return absolute
 
 def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
@@ -228,7 +232,6 @@ def main():
         # Get the local links from this page and add them to the linksToFetch
     newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
     print 'Will be added ', len(newLinksToFetch), ' new links'
-    print newLinksToFetch
 
 # Standard boilerplate to call the main() function to begin
 # the program.
