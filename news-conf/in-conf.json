@@ -18,7 +18,7 @@
     },
     "LinksRegEx": {
         "LocalLinks":       "<a href=\"(.*?)\"",
-        "LinksExcluded":    ".*?/netvolution/.*?|.*?/Themes/.*?|.*?/Temp/.*?|.*?/z_.*?|.*?/polls-archive/.*?/\\?plid=.*?|.*?rss\\..*?|.*?expressads.*?|.*?forum.*?|.*?/chat\\..*?|.*?pdf$|.*?jpg$|.*?jpeg$|.*?png$|.*?gif$|.*?xls$|.*?ico$",
+        "LinksExcluded":    ".*?/netvolution/.*?|.*?/Themes/.*?|.*?/Temp/.*?|.*?/z_.*?|.*?/polls-archive/.*?/\\?plid=.*?|.*?rss\\..*?|.*?expressads.*?|.*?dev\\..*?|.*?forum\\..*?|.*?/chat\\..*?|.*?pdf$|.*?jpg$|.*?jpeg$|.*?png$|.*?gif$|.*?xls$|.*?ico$",
         "LinksIncluded":    ".*?/article\\?aid=.*?|.*?/post\\?aid=.*?"
     },
     "DelayRange": [ 11, 16]
