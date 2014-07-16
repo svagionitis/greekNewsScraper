@@ -147,17 +147,21 @@ def writeHTMLToFile(htmlData, filename):
         sys.exit(1)
 
 def createAbsoluteURL(home, url):
-    home = unicode(home, 'utf-8', errors='ignore')
-    url = unicode(url, 'utf-8', errors='ignore')
+    # Check the type of the home and url. If they are strings
+    # convert them to utf-8
+    if type(home) is str:
+        home = unicode(home, 'utf-8', errors='ignore')
+    if type(url) is str:
+        url = unicode(url, 'utf-8', errors='ignore')
 
-    print 'Processing home: ', home, 'url: ', url
+    print 'Processing home: ', home, 'Type: ', type(home), 'url: ', url, 'Type: ', type(url)
     join = urlparse.urljoin(home, url)
     parse = urlparse.urlparse(join)
     path = posixpath.normpath(parse[2])
 
     absolute = urlparse.urlunparse((parse.scheme, parse.netloc, path, parse.params, parse.query, None))
 
-    print 'Absolute: ', absolute
+    print 'Absolute: ', absolute, 'Type: ', type(absolute)
     return absolute
 
 def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
