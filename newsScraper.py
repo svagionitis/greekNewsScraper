@@ -75,6 +75,8 @@ def getNewsData(htmlData, regexString):
         newsData = replaceEntities(newsData)
         # Remove the images attached
         newsData = re.sub(r'<table.*?>[.\s\S]*?</table>', '', newsData)
+        # Remove the script tags
+        newsData = re.sub(r'<script.*?>[.\s\S]*?</script>', '', newsData)
         # Remove all the html tags, need a clear text
         newsData = re.sub(r'<[^>]*>', '', newsData)
         # Remove any white spaces in the beginning
