@@ -210,6 +210,9 @@ def main():
     link = sys.argv[2]
     print 'Link poped...', link
 
+    if type(link) is str:
+        link = unicode(link, 'utf-8', errors='ignore')
+
     if excludeLocalLinks(link):
         sys.exit(0)
 

@@ -222,6 +222,9 @@ def main():
         print 'Link poped...', link
         print 'Remaining links to be fetched ', len(linksToFetch)
 
+        if type(link) is str:
+            link = unicode(link, 'utf-8', errors='ignore')
+
         if link in linksFetched:
             print 'Link ', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' already fetched...'
             continue
