@@ -1,0 +1,46 @@
+1.
+Fetching... 'http://entertainment.in.gr/html/ent/865/ent.154865.asp'  -  ee4ce987e0cce7c0027b18e232783d690a8284e2
+Traceback (most recent call last):
+  File "newsScraper.py", line 335, in <module>
+    main()
+  File "newsScraper.py", line 319, in main
+    newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
+  File "newsScraper.py", line 232, in getLocalLinks
+    localLinks = re.findall(regExprString, htmlPage)
+  File "/usr/lib/python2.7/re.py", line 177, in findall
+    return _compile(pattern, flags).findall(string)
+TypeError: expected string or buffer
+
+2.
+Fetching... 'http://archive.in.gr/Reviews/imagegallery.asp?lngReviewID=12770&lngChapterID=13427&lngItemID=13433'  -  df51f39530e3c5bfe741df56d5cb177968dee747
+Problem reading url: 'http://archive.in.gr/Reviews/imagegallery.asp?lngReviewID=12770&lngChapterID=13427&lngItemID=13433'
+
+3.
+Fetching... 'http://chat.in.gr/'  -  aac66aadd7d7fdbdf25877cddcc56ce1ddbe054a
+Problem reading url: 'http://chat.in.gr/'
+
+4.
+Link poped... http://dev.mgmt.entertainment.in.gr/html/ent/791/ent.4791_music.asp
+Remaining links to be fetched  21146
+Fetching... 'http://dev.mgmt.entertainment.in.gr/html/ent/791/ent.4791_music.asp'  -  7340ee6bf00d5d04c936e68722ff464b8b6824de
+Problem reading url: 'http://dev.mgmt.entertainment.in.gr/html/ent/791/ent.4791_music.asp'
+
+5.
+Link poped... http://games.in.gr/.
+Remaining links to be fetched  21335
+Fetching... 'http://games.in.gr/.'  -  676150d254522734adbeada4980a91419f1b311e
+Problem reading url: 'http://games.in.gr/.'
+
+6.
+Link poped... http://reviews.in.gr/files/1/2014/Paideia-Various/ΑρχΚΓΛ_10.02.14.pdf
+Remaining links to be fetched  3184
+Link 
+Traceback (most recent call last):
+  File "newsScraper.py", line 277, in <module>
+    main()
+  File "newsScraper.py", line 227, in main
+    if excludeLocalLinks(link):
+  File "newsScraper.py", line 65, in excludeLocalLinks
+    print 'Link ', repr(urllib.unquote(localLink)).decode("unicode-escape").encode('latin-1'), ' is excluded. It will not be fetched...'
+UnicodeEncodeError: 'latin-1' codec can't encode characters in position 52-57: ordinal not in range(256)
+
