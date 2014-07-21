@@ -15,6 +15,7 @@ import sqlite3  ##sqlite
 import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
 import json     ##json to serialize data, web friendly?? and read json config file
+import chardet  ## use to detect char encoding
 
 # http://wolfprojects.altervista.org/changeua.php
 from urllib import FancyURLopener
@@ -62,7 +63,6 @@ def excludeLocalLinks(localLink):
     # Regex for excluded links
     excludeLink = re.compile(jsonConf['LinksRegEx']['LinksExcluded'])
     if excludeLink.match(localLink):
-        print 'Link ', repr(urllib.unquote(localLink)).decode("unicode-escape").encode('latin-1'), ' is excluded. It will not be fetched...'
         return True
     else:
         return False
@@ -91,12 +91,12 @@ def getNewsData(htmlData, regexString):
         newsData = 'N/A'
     return newsData
 
-def createNewsData(htmlData, fullNewsURL):
+def createNewsData(htmlData, link):
     data = {}
     data['DateRetrieved'] = str(datetime.now())
 
-    data['NewsLink'] = repr(urllib.unquote(fullNewsURL)).decode("unicode-escape").encode('latin-1')
-    data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
+    data['NewsLink'] = repr(urllib.unquote(link['url'])).decode("unicode-escape").encode(link['encoding'])
+    data['HashNewsLink'] = hashlib.sha1(link['url']).hexdigest()
 
     data['NewsTitle'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsTitle'])
 
@@ -174,16 +174,16 @@ def getLocalLinks(htmlPage, baseURL, fetchedLinks, toBeFetchedLinks):
 
 ## Version that uses try/except to print an error message if the
 ## urlopen() fails.
-def getUrl(url):
+def getUrl(link):
     myopener = MyOpener()
 
     try:
         #ufile = urllib.urlopen(url)
-        ufile = myopener.open(url)
+        ufile = myopener.open(link['url'])
         if ufile.info().gettype() == 'text/html':
             return ufile.read()
     except IOError:
-        print 'Problem reading url:', repr(urllib.unquote(url)).decode("unicode-escape").encode('latin-1')
+        print 'Problem reading url:', repr(urllib.unquote(link['url'])).decode("unicode-escape").encode(link['encoding'])
         sys.exit(1)
 
 def usage():
@@ -199,7 +199,18 @@ def main():
     # Read json conf files
     readJsonConfFile(sys.argv[1])
 
-    baseURL = jsonConf['BaseURL']
+    # Link is a dict of url and char encoding of url
+    link = {
+            "url": None,
+            "encoding": None
+            }
+
+    link['url'] = jsonConf['BaseURL']
+    linkEncInfo = chardet.detect(urllib.unquote(link['url']))
+    print 'Link Encoder Info:', linkEncInfo
+    link['encoding'] = linkEncInfo['encoding']
+
+    print 'Link Info: ', link
 
     linksToFetch = set([])
     linksFetched = set([])
@@ -210,47 +221,55 @@ def main():
         linksToFetch = restorePickle(jsonConf['Filenames']['LinksToFetch'])
         linksFetched = restorePickle(jsonConf['Filenames']['LinksFetched'])
     else:
-        baseHtmlData = getUrl(baseURL)
-        linksToFetch = getLocalLinks(baseHtmlData, baseURL, linksFetched, linksToFetch)
-        linksFetched.add(baseURL)
+        baseHtmlData = getUrl(link)
+        linksToFetch = getLocalLinks(baseHtmlData, link['url'], linksFetched, linksToFetch)
+        linksFetched.add(link['url'])
 
     print 'Initial unique links to be retrieved ', len(linksToFetch)
 
     # http://stackoverflow.com/questions/16625960/modifying-a-set-while-iterating-over-it
     while linksToFetch:
-        link = linksToFetch.pop()
-        print 'Link poped...', link
+        link = {
+                "url": None,
+                "encoding": None
+                }
+
+        link['url'] = linksToFetch.pop()
+        print 'Link: ', link['url']
+        linkEncInfo = chardet.detect(urllib.unquote(link['url']))
+        print 'Link Encoder Info:', linkEncInfo
+        link['encoding'] = linkEncInfo['encoding']
+
+        print 'Link info poped...', link
         print 'Remaining links to be fetched ', len(linksToFetch)
 
-        if type(link) is str:
-            link = unicode(link, 'utf-8', errors='ignore')
-
-        if link in linksFetched:
-            print 'Link ', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' already fetched...'
+        if link['url'] in linksFetched:
+            print 'Link ', repr(urllib.unquote(link['url'])).decode("unicode-escape").encode(link['encoding']), ' already fetched...'
             continue
 
-        if excludeLocalLinks(link):
+        if excludeLocalLinks(link['url']):
+            print 'Link ', repr(urllib.unquote(link['url'])).decode("unicode-escape").encode(link['encoding']), ' is excluded. It will not be fetched...'
             continue
 
-        if jsonConf['NetworkLocation'] not in urlparse.urlparse(link).netloc:
-            print 'Link', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' is not in this domain...'
+        if jsonConf['NetworkLocation'] not in urlparse.urlparse(link['url']).netloc:
+            print 'Link', repr(urllib.unquote(link['url'])).decode("unicode-escape").encode(link['encoding']), ' is not in this domain...'
             linksFetched.add(link)
             continue
 
         # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
-        print 'Fetching...', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' - ', hashlib.sha1(link).hexdigest()
+        print 'Fetching...', repr(urllib.unquote(link['url'])).decode("unicode-escape").encode(link['encoding']), ' - ', hashlib.sha1(link['url']).hexdigest()
 
         htmlData = getUrl(link)
 
         # Check if empty
         if not htmlData:
-            print 'Link ', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' appears empty...'
+            print 'Link ', repr(urllib.unquote(link['url'])).decode("unicode-escape").encode(link['encoding']), ' appears empty...'
             print 'The content is @@', htmlData, '@@'
             continue
 
         # Check if it's a news link
         isNewsLink = re.compile(jsonConf['LinksRegEx']['LinksIncluded'])
-        if isNewsLink.match(link):
+        if isNewsLink.match(link['url']):
             # writeHTMLToFile(htmlData, 'iefimerida/'+hashlib.sha1(link).hexdigest()+'.html')
 
             # http://stackoverflow.com/questions/5648573/python-print-unicode-strings-in-arrays-as-characters-not-code-points
@@ -263,12 +282,12 @@ def main():
             jsonDump(data, jsonConf['Filenames']['NewsJSON'])
 
         # Get the local links from this page and add them to the linksToFetch
-        newLinksToFetch = getLocalLinks(htmlData, link, linksFetched, linksToFetch)
+        newLinksToFetch = getLocalLinks(htmlData, link['url'], linksFetched, linksToFetch)
         print 'Will be added ', len(newLinksToFetch), ' new links'
         linksToFetch.update(newLinksToFetch)
 
         # Add the link if successfully fetched.
-        linksFetched.add(link)
+        linksFetched.add(link['url'])
         print 'Total links fetched so far ', len(linksFetched)
 
         nextLinkDelay(jsonConf['DelayRange'][0], jsonConf['DelayRange'][1])
