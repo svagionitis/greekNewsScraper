@@ -8,7 +8,8 @@ import re
 import random   ##for pseudo-random generation
 import time     ##for time functions and sleep
 from datetime import datetime ##get time
-import urllib   ##url fetching
+# http://wolfprojects.altervista.org/changeua.php
+import urllib   ##url fetching, FancyURLopener see 
 import urlparse ##url parse
 import posixpath
 import sqlite3  ##sqlite
@@ -16,14 +17,11 @@ import hashlib  ##hash md5 sha1...
 import pickle   ##pickle to serialize data
 import json     ##json to serialize data, web friendly?? and read json config file
 
-# http://wolfprojects.altervista.org/changeua.php
-from urllib import FancyURLopener
-
 # Global variable for json conf file
 jsonConf = {}
 
 # Use google bot as user agent
-class MyOpener(FancyURLopener):
+class MyOpener(urllib.FancyURLopener):
     version = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
 def readJsonConfFile(filename):
@@ -96,7 +94,7 @@ def createNewsData(htmlData, fullNewsURL):
     data['DateRetrieved'] = str(datetime.now())
 
     data['NewsLink'] = repr(urllib.unquote(fullNewsURL)).decode("unicode-escape").encode('latin-1')
-    data['HashNewsLink'] = hashlib.sha1(fullNewsURL).hexdigest()
+    data['HashNewsLink'] = hashlib.sha1(fullNewsURL.encode('latin-1')).hexdigest()
 
     data['NewsTitle'] = getNewsData(htmlData, jsonConf['NewsRegEx']['NewsTitle'])
 
@@ -152,9 +150,9 @@ def createAbsoluteURL(home, url):
     # Check the type of the home and url. If they are strings
     # convert them to utf-8
     if type(home) is str:
-        home = unicode(home, 'utf-8', errors='ignore')
+        home = unicode(home, 'latin-1', errors='ignore')
     if type(url) is str:
-        url = unicode(url, 'utf-8', errors='ignore')
+        url = unicode(url, 'latin-1', errors='ignore')
 
     join = urlparse.urljoin(home, url)
     parse = urlparse.urlparse(join)
@@ -178,12 +176,16 @@ def getUrl(url):
     myopener = MyOpener()
 
     try:
-        #ufile = urllib.urlopen(url)
-        ufile = myopener.open(url)
-        if ufile.info().gettype() == 'text/html':
-            return ufile.read()
-    except IOError:
-        print 'Problem reading url:', repr(urllib.unquote(url)).decode("unicode-escape").encode('latin-1')
+        openedUrl = myopener.open(url.encode('latin-1'))
+
+        try:
+            htmlData = openedUrl.read()
+        finally:
+            openedUrl.close()
+
+        return htmlData
+    except IOError, err:
+        print 'Problem reading url:', repr(urllib.unquote(url)).decode("unicode-escape").encode('latin-1'), 'URL error: ', err
         sys.exit(1)
 
 def usage():
@@ -223,7 +225,7 @@ def main():
         print 'Remaining links to be fetched ', len(linksToFetch)
 
         if type(link) is str:
-            link = unicode(link, 'utf-8', errors='ignore')
+            link = unicode(link, 'latin-1', errors='ignore')
 
         if link in linksFetched:
             print 'Link ', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' already fetched...'
@@ -238,7 +240,7 @@ def main():
             continue
 
         # http://stackoverflow.com/questions/8136788/decode-escaped-characters-in-url
-        print 'Fetching...', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' - ', hashlib.sha1(link).hexdigest()
+        print 'Fetching...', repr(urllib.unquote(link)).decode("unicode-escape").encode('latin-1'), ' - ', hashlib.sha1(link.encode('latin-1')).hexdigest()
 
         htmlData = getUrl(link)
 
