@@ -20,5 +20,5 @@
         "LinksExcluded":    ".*?print.*?|.*?/feed$|.*?pdf$|.*?jpg$|.*?jpeg$|.*?png$|.*?gif$|.*?xls$",
         "LinksIncluded":    ".*?/news/.*?|.*?/interview/.*?|.*?/content/.*?"
     },
-    "DelayRange": [ 11, 16]
+    "DelayRange": [ 11, 13]
 }
