@@ -44,3 +44,12 @@ Traceback (most recent call last):
     print 'Link ', repr(urllib.unquote(localLink)).decode("unicode-escape").encode('latin-1'), ' is excluded. It will not be fetched...'
 UnicodeEncodeError: 'latin-1' codec can't encode characters in position 52-57: ordinal not in range(256)
 
+7.
+Fetching... u'http://finance.in.gr/StockTables.aspx?letter=Ζ'  - 
+Traceback (most recent call last):
+  File "newsScraper.py", line 282, in <module>
+    main()
+  File "newsScraper.py", line 241, in main
+    print 'Fetching...', repr(urllib.unquote(link)).decode("unicode-escape").encode('utf-8'), ' - ', hashlib.sha1(link).hexdigest()
+UnicodeEncodeError: 'ascii' codec can't encode character u'\u0396' in position 45: ordinal not in range(128)
+
