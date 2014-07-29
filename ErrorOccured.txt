@@ -53,3 +53,9 @@ Traceback (most recent call last):
     print 'Fetching...', repr(urllib.unquote(link)).decode("unicode-escape").encode('utf-8'), ' - ', hashlib.sha1(link).hexdigest()
 UnicodeEncodeError: 'ascii' codec can't encode character u'\u0396' in position 45: ordinal not in range(128)
 
+8.
+Link poped... http://www.protothema.gr/world/article/394611/israilini-vouleutis-kalei-se-polemo-me-tin-palaistini
+Remaining links to be fetched  22190
+Fetching... u'http://www.protothema.gr/world/article/394611/israilini-vouleutis-kalei-se-polemo-me-tin-palaistini'  -  e381030c7e4c99eab2e742b78b2bbcae137fab93
+Problem reading url: u'http://www.protothema.gr/world/article/394611/israilini-vouleutis-kalei-se-polemo-me-tin-palaistini' URL error:  ('http protocol error', 0, 'got a bad status line', None)
+
