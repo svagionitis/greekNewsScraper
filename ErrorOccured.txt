@@ -59,3 +59,9 @@ Remaining links to be fetched  22190
 Fetching... u'http://www.protothema.gr/world/article/394611/israilini-vouleutis-kalei-se-polemo-me-tin-palaistini'  -  e381030c7e4c99eab2e742b78b2bbcae137fab93
 Problem reading url: u'http://www.protothema.gr/world/article/394611/israilini-vouleutis-kalei-se-polemo-me-tin-palaistini' URL error:  ('http protocol error', 0, 'got a bad status line', None)
 
+9.
+Link poped... http://www.protothema.gr/politics/article/393773/aggelies/vale-aggelia
+Remaining links to be fetched  23386
+Fetching... u'http://www.protothema.gr/politics/article/393773/aggelies/vale-aggelia'  -  34985ae9c7170c7829c8dad4a799ae21d552697c
+Problem reading url: u'http://www.protothema.gr/politics/article/393773/aggelies/vale-aggelia' URL error:  [Errno socket error] [Errno 104] Connection reset by peer
+
