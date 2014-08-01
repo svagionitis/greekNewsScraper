@@ -72,4 +72,10 @@ Remaining links to be fetched  11260
 Fetching... u'http://www.koutipandoras.gr/tags/prigkipisa-hristina'  -  b9604ff655c543cf69229f57922001c991dbf24f
 Problem reading url: u'http://www.koutipandoras.gr/tags/prigkipisa-hristina' URL error:  [Errno socket error] [Errno 110] Connection timed out
 
+11.
+
+Link poped... http://www.protothema.gr/car-and-speed/video/article/275487/aggelies/vale-aggelia
+Remaining links to be fetched  28821
+Fetching... u'http://www.protothema.gr/car-and-speed/video/article/275487/aggelies/vale-aggelia'  -  5ecdb54d8c48cb1f70790161181294b3490cd8bc
+Problem reading url: u'http://www.protothema.gr/car-and-speed/video/article/275487/aggelies/vale-aggelia' URL error:  [Errno socket error] [Errno 104] Connection reset by peer
 
