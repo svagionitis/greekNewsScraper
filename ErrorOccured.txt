@@ -65,3 +65,11 @@ Remaining links to be fetched  23386
 Fetching... u'http://www.protothema.gr/politics/article/393773/aggelies/vale-aggelia'  -  34985ae9c7170c7829c8dad4a799ae21d552697c
 Problem reading url: u'http://www.protothema.gr/politics/article/393773/aggelies/vale-aggelia' URL error:  [Errno socket error] [Errno 104] Connection reset by peer
 
+10.
+
+Link poped... http://www.koutipandoras.gr/tags/prigkipisa-hristina
+Remaining links to be fetched  11260
+Fetching... u'http://www.koutipandoras.gr/tags/prigkipisa-hristina'  -  b9604ff655c543cf69229f57922001c991dbf24f
+Problem reading url: u'http://www.koutipandoras.gr/tags/prigkipisa-hristina' URL error:  [Errno socket error] [Errno 110] Connection timed out
+
+
