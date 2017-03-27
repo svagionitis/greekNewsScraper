@@ -63,7 +63,7 @@ def excludeLocalLinks(localLink):
 
 def getNewsTitle(htmlData):
     newsTitle = ''
-    regExprString = r'<div class="views-field-title">\s.*?<span class="field-content"><h1>(.*?)</h1></span>\s.*?</div>'
+    regExprString = r'<h1 itemprop="headline" class="news-title-large">(.*?)</h1>'
     if re.search(regExprString, htmlData):
         newsTitle = re.search(regExprString, htmlData).group(1)
         newsTitle = replaceEntities(newsTitle)
@@ -97,7 +97,7 @@ def getNewsDescription(htmlData):
 
 def getNewsKeywords(htmlData):
     newsKeywords = []
-    regExprString = r'<meta name="keywords" content="(.*?)" />'
+    regExprString = r'<meta name=".*keywords" content="(.*?)" />'
     if re.search(regExprString, htmlData):
         newsKeywords = re.search(regExprString, htmlData).group(1)
         newsKeywords = replaceEntities(newsKeywords)
@@ -127,7 +127,7 @@ def getNewsDateUpdated(htmlData):
 
 def getNewsText(htmlData):
     newsText = ''
-    regExprString = r'<div class="content clear-block">\s([.\s\S]*?)\s.*?</div>'
+    regExprString = r'<div class="news-articleBody" itemprop="articleBody">\s([.\s\S]*?)\s.*?</div>'
     if re.search(regExprString, htmlData):
         newsText = re.search(regExprString, htmlData).group(1)
         newsText = replaceEntities(newsText)
